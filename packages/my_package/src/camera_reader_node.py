@@ -4,6 +4,7 @@ import os
 import rospy
 from duckietown.dtros import DTROS, NodeType
 from sensor_msgs.msg import CompressedImage
+from std_msgs.msg import Float32  # Import for distance publishing
 
 import cv2
 from cv_bridge import CvBridge
@@ -13,16 +14,23 @@ class CameraReaderNode(DTROS):
     def __init__(self, node_name):
         # initialize the DTROS parent class
         super(CameraReaderNode, self).__init__(node_name=node_name, node_type=NodeType.VISUALIZATION)
+
         # static parameters
         self._vehicle_name = os.environ['VEHICLE_NAME']
         self._camera_topic = f"/{self._vehicle_name}/camera_node/image/compressed"
+        
         # bridge between OpenCV and ROS
         self._bridge = CvBridge()
+
         # create window
         self._window = "camera-reader"
         cv2.namedWindow(self._window, cv2.WINDOW_AUTOSIZE)
+
         # construct subscriber
         self.sub = rospy.Subscriber(self._camera_topic, CompressedImage, self.callback)
+
+        # Publisher for object distance
+        self.distance_pub = rospy.Publisher('/object_distance', Float32, queue_size=10)
 
         # Define a reference object size and distance for scaling (adjust these values)
         self.reference_object_width = 0.055  # Real width of the duck in meters (5.5 cm)
@@ -35,7 +43,7 @@ class CameraReaderNode(DTROS):
     def callback(self, msg):
         # convert JPEG bytes to CV image
         image = self._bridge.compressed_imgmsg_to_cv2(msg)
-        
+
         # Convert the image to HSV (Hue, Saturation, Value) color space
         hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
@@ -80,6 +88,9 @@ class CameraReaderNode(DTROS):
         if distance is not None:
             # Display the distance on the image (in meters)
             cv2.putText(image, f"Distance: {distance:.2f} m", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2, cv2.LINE_AA)
+            
+            # Publish the distance to the /object_distance topic
+            self.distance_pub.publish(distance)
 
         # Display the frame with bounding boxes around yellow areas and distance
         cv2.imshow(self._window, image)
@@ -98,7 +109,6 @@ class CameraReaderNode(DTROS):
             return float('inf')  # Return a very large number if the object width is zero (no object detected)
 
         distance = self.reference_distance * (self.reference_width_pixels / object_width)
-
         return distance
 
 if __name__ == '__main__':
