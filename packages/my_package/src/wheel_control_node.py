@@ -18,23 +18,33 @@ class WheelControlNode(DTROS):
         """Sets wheel speed for a specific duration."""
         message = WheelsCmdStamped(vel_left=left_speed, vel_right=right_speed)
 
-        start_time2 = time.time()
         rate = rospy.Rate(10)  # 10 Hz publishing
+
+        self._publisher.publish(message)
+        rate.sleep()
+
+
+        # start_time2 = time.time()
+        # rate = rospy.Rate(10)  # 10 Hz publishing
         
-        while not rospy.is_shutdown() and (time.time() - start_time2) < duration:
-            self._publisher.publish(message)
-            rate.sleep()
+        # while not rospy.is_shutdown() and (time.time() - start_time2) < duration:
+        #     self._publisher.publish(message)
+        #     rate.sleep()
 
     def run(self):
         rospy.loginfo("Starting speed sequence...")
         
-         
-        max_speed = 0.6
-        min_speed = 0.3
-        distance = 0.1 #cm
 
-        start_time = time.time()
-        rate = rospy.Rate(10)  # 10 Hz publishing
+        # self.set_speed(0.0, 0.0, 1)
+         
+        max_speed = 0.7
+        min_speed = 0.2
+        distance = 1 #m
+
+        #idk it is dviitng by 3
+
+        prev_time = time.time()
+        # rate = rospy.Rate(10)  # 10 Hz publishing
         
         a = (max_speed**2 - min_speed**2) / (2 * distance) # acceleration
 
@@ -42,26 +52,27 @@ class WheelControlNode(DTROS):
 
         speed = min_speed
 
+        # 30% speed for 5 seconds
+        # self.set_speed(speed, speed, 2)
+        print("SPEED", speed)
+
+
         while not rospy.is_shutdown() and speed < max_speed:
 
-            t = (time.time() - start_time)
+            now = time.time()
+            dt = now - prev_time
+            prev_time = now
             
-            speed = min_speed + t * a
+            speed += dt * a
 
-            print(speed, t)
-            # self.set_speed(speed, speed, 1)
+            print(speed, dt)
+            self.set_speed(speed, speed, 0.1)
             # rate = rospy.Rate(10)  # 10 Hz publishing
 
-
+        print("SPEED", speed)
 
         # 30% speed for 5 seconds
-        self.set_speed(0.3, 0.3, 5)
-        
-        # # 60% speed for 10 seconds
-        # self.set_speed(0.6, 0.6, 10)
-        
-        # # 30% speed for 5 seconds
-        # self.set_speed(0.3, 0.3, 5)
+        # self.set_speed(speed, speed, 2)
         
         # Stop the robot
         self.set_speed(0.0, 0.0, 1)
