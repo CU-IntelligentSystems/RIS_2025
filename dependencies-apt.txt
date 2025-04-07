@@ -1,2 +1,4 @@
 # LIST YOUR APT PACKAGES HERE
-ros-noetic-rtabmap-ros
+ros-noetic-robot-localization
+ros-noetic-tf
+ros-noetic-rviz
