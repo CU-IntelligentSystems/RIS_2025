@@ -39,7 +39,7 @@ class WheelControlNode(DTROS):
          
         max_speed = 0.7
         min_speed = 0.2
-        distance = 1 #m
+        distance = 5 #m
 
         #idk it is dviitng by 3
 
