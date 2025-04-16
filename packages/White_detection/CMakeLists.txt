@@ -26,7 +26,7 @@ catkin_package(
 # Install Python scripts
 # This makes 'rosrun White_detection detection.py' work
 catkin_install_python(PROGRAMS
-  scripts/detection.py
+  scripts/line_status_detector.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
