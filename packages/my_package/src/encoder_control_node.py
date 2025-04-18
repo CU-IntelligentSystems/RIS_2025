@@ -11,13 +11,13 @@ class EncoderControlNode(DTROS):
     def __init__(self, node_name):
         super(EncoderControlNode, self).__init__(node_name=node_name, node_type=NodeType.PERCEPTION)
         
-        self.vehicle_name = os.environ['VEHICLE_NAME']
+        vehicle_name = os.environ['VEHICLE_NAME']
         wheels_topic = f"/{vehicle_name}/wheels_driver_node/wheels_cmd"
         self._publisher = rospy.Publisher(wheels_topic, WheelsCmdStamped, queue_size=1)
 
         # static parameters
-        self._left_encoder_topic = f"/{self._vehicle_name}/left_wheel_encoder_node/tick"
-        self._right_encoder_topic = f"/{self._vehicle_name}/right_wheel_encoder_node/tick"
+        self._left_encoder_topic = f"/{vehicle_name}/left_wheel_encoder_node/tick"
+        self._right_encoder_topic = f"/{vehicle_name}/right_wheel_encoder_node/tick"
 
         # temporary data storage
         self._ticks_left = None
