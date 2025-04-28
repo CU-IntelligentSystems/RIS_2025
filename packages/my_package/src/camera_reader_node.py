@@ -33,9 +33,9 @@ class CameraReaderNode(DTROS):
         self.distance_pub = rospy.Publisher('/object_distance', Float32, queue_size=10)
 
         # Define a reference object size and distance for scaling (adjust these values)
-        self.reference_object_width = 0.055  # Real width of the duck in meters (5.5 cm)
+        self.reference_object_width = 0.01  # Real width of the duck in meters (5.5 cm)
         self.reference_distance = 0.15  # Real distance of the duck in meters (15 cm)
-        self.reference_width_pixels = 66  # Bounding box width in pixels when the object is at 15 cm
+        self.reference_width_pixels = 20  # Bounding box width in pixels when the object is at 15 cm
 
         # Calculate the scaling factor based on the reference data
         self.scaling_factor = self.reference_object_width / self.reference_width_pixels
@@ -48,18 +48,32 @@ class CameraReaderNode(DTROS):
         hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
         # Define the range for yellow color in HSV space
-        lower_yellow = (20, 100, 100)  # Lower bound for yellow
-        upper_yellow = (40, 255, 255)  # Upper bound for yellow
+        #lower_yellow = (20, 100, 100)  # Lower bound for yellow
+        #upper_yellow = (40, 255, 255)  # Upper bound for yellow
 
         # Create a binary mask where yellow areas are white, others are black
-        yellow_mask = cv2.inRange(hsv_image, lower_yellow, upper_yellow)
+        #yellow_mask = cv2.inRange(hsv_image, lower_yellow, upper_yellow)
+        # Define lower and upper bounds for red in HSV
+        lower_red1 = (0, 100, 100)
+        upper_red1 = (10, 255, 255)
+
+        lower_red2 = (160, 100, 100)
+        upper_red2 = (180, 255, 255)
+
+        # Create two masks and combine them
+        mask1 = cv2.inRange(hsv_image, lower_red1, upper_red1)
+        mask2 = cv2.inRange(hsv_image, lower_red2, upper_red2)
+
+        # Combine the masks
+        red_mask = cv2.bitwise_or(mask1, mask2)
+
 
         # Perform some cleaning of the mask (optional)
-        yellow_mask = cv2.morphologyEx(yellow_mask, cv2.MORPH_OPEN, None)
-        yellow_mask = cv2.morphologyEx(yellow_mask, cv2.MORPH_CLOSE, None)
+        red_mask = cv2.morphologyEx(red_mask, cv2.MORPH_OPEN, None)
+        red_mask = cv2.morphologyEx(red_mask, cv2.MORPH_CLOSE, None)
 
         # Find contours of the yellow areas in the mask
-        contours, _ = cv2.findContours(yellow_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        contours, _ = cv2.findContours(red_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
         # Initialize variables for tracking the largest contour (yellow duck)
         max_area = 0
