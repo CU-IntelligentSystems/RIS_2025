@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import rospy
 from sensor_msgs.msg import Imu
-import numpy as np # Used for creating diagonal matrices easily
+import numpy as np 
 
 class ImuCovarianceFixer:
     def __init__(self):
@@ -43,7 +43,7 @@ class ImuCovarianceFixer:
         msg_out = msg_in
 
         # Overwrite the covariance matrices with fixed positive values
-        # Important: Keep orientation covariance as is (likely invalid with -1 flag)
+        
         msg_out.angular_velocity_covariance = self.ang_vel_cov_matrix
         msg_out.linear_acceleration_covariance = self.lin_acc_cov_matrix
 

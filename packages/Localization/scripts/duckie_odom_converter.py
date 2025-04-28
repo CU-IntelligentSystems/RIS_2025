@@ -27,7 +27,7 @@ class DuckieOdomConverter:
 
         self.dist_per_tick = (2.0 * math.pi * self.radius) / self.ticks_per_rev
 
-        # --- Covariance Parameters (Tune These!) ---
+        # --- Covariance Parameters 
         self.pose_cov_x = rospy.get_param('~pose_covariance/x', 1e-4) # Using smaller test values
         self.pose_cov_y = rospy.get_param('~pose_covariance/y', 1e-4)
         self.pose_cov_yaw = rospy.get_param('~pose_covariance/yaw', 1e-5)
@@ -168,7 +168,7 @@ class DuckieOdomConverter:
         self.last_update_time = current_time
         self.last_calc_ticks_left = calc_ticks_left
         self.last_calc_ticks_right = calc_ticks_right
-        # Update associated stamps as well (might not be strictly needed if only using last_update_time)
+        # Update associated stamps as well
         self.last_calc_stamp_left = calc_stamp_left
         self.last_calc_stamp_right = calc_stamp_right
 

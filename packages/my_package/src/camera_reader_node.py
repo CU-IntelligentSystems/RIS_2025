@@ -11,9 +11,7 @@ class CameraReaderNode(DTROS):
     def __init__(self, node_name):
         # Initialize the DTROS parent class with a visualization node type
         super(CameraReaderNode, self).__init__(node_name=node_name, node_type=NodeType.VISUALIZATION)
-        # Retrieve vehicle name from environment; default if not set
         self._vehicle_name = os.environ.get('VEHICLE_NAME', 'default_vehicle')
-        # Construct the topic name using the vehicle name
         self._camera_topic = f"/{self._vehicle_name}/camera_node/image/compressed"
         # Initialize CvBridge for converting ROS images to OpenCV images
         self._bridge = CvBridge()

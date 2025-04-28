@@ -15,7 +15,7 @@ import math
 # ROS Msgs
 from sensor_msgs.msg import CompressedImage, CameraInfo, Image
 from geometry_msgs.msg import Point, PointStamped, TransformStamped
-from std_msgs.msg import Header # Correct Header import
+from std_msgs.msg import Header
 
 # ROS Tools
 from cv_bridge import CvBridge, CvBridgeError
@@ -24,15 +24,15 @@ import tf_conversions # Needed for quaternion math
 from image_geometry import PinholeCameraModel # Needed for projection
 import message_filters # Needed for synchronizing topics
 
-class LineDetectorProjectorAveraged: # Using Averaged name
+class LineDetectorProjectorAveraged:
     def __init__(self):
-        # Use a valid ROS node name
+       
         node_name = 'line_detector_projector_avg'
         rospy.init_node(node_name, anonymous=True)
 
         # --- Parameters ---
         try:
-            # Correctly load HSV parameters and ensure correct dtype
+            # Correctly load HSV parameters
             hsv_lower_param = rospy.get_param("~hsv_lower_white", [0, 0, 180])
             hsv_upper_param = rospy.get_param("~hsv_upper_white", [180, 50, 255])
             self.hsv_lower_white = np.array([int(v) for v in hsv_lower_param], dtype=np.uint8)
@@ -51,13 +51,12 @@ class LineDetectorProjectorAveraged: # Using Averaged name
             self.hough_min_line_len = rospy.get_param("~hough_min_line_len", 20)
             self.hough_max_line_gap = rospy.get_param("~hough_max_line_gap", 5)
             self.min_line_slope_abs = rospy.get_param("~min_line_slope_abs", 0.3)
-            self.target_frame = rospy.get_param("~target_frame", "ente/base") # Target for world coords
+            self.target_frame = rospy.get_param("~target_frame", "ente/base")
 
-            rospy.loginfo(f"[{node_name}] Parameters Initialized:")
+            rospy.loginfo(f"[{node_name}]   Parameters Initialized:")
             rospy.loginfo(f"[{node_name}]   HSV Lower (uint8): {self.hsv_lower_white}")
             rospy.loginfo(f"[{node_name}]   HSV Upper (uint8): {self.hsv_upper_white}")
             rospy.loginfo(f"[{node_name}]   Target Frame: {self.target_frame}")
-            # Add logging for other parameters if needed
 
         except ValueError as e:
             rospy.logfatal(f"[{node_name}] Invalid parameter format. Ensure lists contain only numbers. Error: {e}")

@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>slam_loopclosure</name>
+  <version>0.0.1</version>
+  <description>A package for EKF-based SLAM with pose-graph loop closure for Duckiebots.</description>
+
+  <maintainer email="user@todo.todo">Your Name</maintainer>
+
+  <license>TODO</license> <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>message_generation</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>nav_msgs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+
+  <build_export_depend>message_runtime</build_export_depend>
+  <build_export_depend>std_msgs</build_export_depend>
+  <build_export_depend>sensor_msgs</build_export_depend>
+  <build_export_depend>nav_msgs</build_export_depend>
+  <build_export_depend>geometry_msgs</build_export_depend>
+
+  <exec_depend>message_runtime</exec_depend>
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>nav_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>tf</exec_depend>
+  <exec_depend>cv_bridge</exec_depend> <exec_depend>python-numpy</exec_depend> <exec_depend>python-skimage</exec_depend> <export>
+    </export>
+</package>
+

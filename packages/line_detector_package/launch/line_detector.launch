@@ -1,0 +1,11 @@
+<launch>
+
+  <rosparam file="$(find line_detector_package)/config/line_detector.yaml" command="load" />
+  
+  <node name="line_detector_node" pkg="line_detector" type="line_detector_node" output="screen">
+    <param name="veh" value="$(arg veh)" />
+
+  </node>
+  
+</launch>
+

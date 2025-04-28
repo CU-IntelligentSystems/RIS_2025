@@ -1,0 +1,10 @@
+version: '1.0'
+
+line_detector_node:
+  img_size: [120, 160]        
+  top_cutoff: 40              
+  colors:
+    white:
+      low: [0, 0, 200]      
+      high: [180, 55, 255]    
+
