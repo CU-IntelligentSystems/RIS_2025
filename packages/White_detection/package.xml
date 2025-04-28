@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>White_detection</name>
+  <version>0.1.0</version>
+  <description>Detects white lane lines in the lower half of an image and projects them to the ground plane relative to the robot.</description> 
+  <maintainer email="your_email@example.com">Your Name</maintainer> 
+  <license>TODO</license> <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>rospy</depend>
+  <depend>sensor_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>cv_bridge</depend>
+  <depend>image_geometry</depend>
+  <depend>tf2_ros</depend>
+  <depend>tf_conversions</depend>
+  <depend>message_filters</depend>
+
+</package> 

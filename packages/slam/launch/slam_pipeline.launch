@@ -1,0 +1,27 @@
+<launch>
+
+    <arg name="veh" default="ente" />
+
+    <arg name="pkg_mapper"           default="slam" /> <arg name="script_mapper"        default="slam_mapper_node.py" /> <arg name="node_mapper_name"     default="slam_mapper_node" /> 
+    <include file="$(find Localization)/launch/duckiebot_localization.launch" />
+          <include file="$(find White_detection)/launch/white_detection.launch" >
+          <arg name="veh" value="$(arg veh)" /> </include>
+
+
+    <node pkg="$(arg pkg_mapper)" type="$(arg script_mapper)" name="$(arg node_mapper_name)" output="screen">
+
+        <param name="map_resolution" value="0.05"/>   
+           <param name="map_width_meters" value="10.0"/>
+                <param name="map_height_meters" value="10.0"/>    
+                <param name="map_publish_rate" value="1.0"/> 
+                     <param name="map_frame_id" value="odom"/>  
+                            <param name="mark_distance_y" value="0.15"/>
+                                 <param name="mark_distance_x" value="0.1"/>   
+                                    <param name="mark_radius_cells" value="0"/>
+                                          <remap from="~line/left/status" to="/line_status_detector/line/left/status"/>
+        <remap from="~line/right/status" to="/line_status_detector/line/right/status"/>
+        <remap from="/odometry/filtered" to="/odometry/filtered"/>
+
+    </node>
+
+</launch>
