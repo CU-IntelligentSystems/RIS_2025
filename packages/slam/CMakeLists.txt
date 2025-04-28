@@ -21,6 +21,7 @@ catkin_package(
 # Install Python script (make sure filename matches)
 catkin_install_python(PROGRAMS
   scripts/slam_mapper_node.py # CHANGED FILENAME (OPTIONAL)
+  scripts/map_saver_node.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

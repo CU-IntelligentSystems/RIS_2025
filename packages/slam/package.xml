@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>slam</name> <version>0.1.0</version>
-  <description>Basic grid mapping based on line status detection and odometry for Duckiebot.</description> <maintainer email="your_email@example.com">Your Name</maintainer>
-  <license>TODO</license>
+  <description>Basic grid mapping based on line status detection and odometry for Duckiebot. Added map saving.</description> <maintainer email="timwilliambense@gmail.com">Tim William Bense</maintainer>
+  <license>MIT</license>
 
   <buildtool_depend>catkin</buildtool_depend>
 
@@ -11,6 +11,7 @@
   <depend>nav_msgs</depend>
   <depend>geometry_msgs</depend>
   <depend>tf</depend>
+  <depend>std_srvs</depend>
 
   <exec_depend>python-numpy</exec_depend>
 
