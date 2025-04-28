@@ -1,0 +1,36 @@
+# Parameters for line_status_detector_updated.py
+hsv_lower_white: [0, 0, 150]
+hsv_upper_white: [180, 80, 255]
+hsv_lower_yellow: [20, 100, 100]
+hsv_upper_yellow: [40, 255, 255]
+
+blur_ksize: 5
+canny_low_thresh: 50
+canny_high_thresh: 150
+hough_rho: 1
+hough_theta: 0.01745 # pi/180
+hough_threshold: 20
+hough_min_line_len: 20
+hough_max_line_gap: 5
+min_line_slope_abs: 0.3
+
+# --- CRITICAL: Replace with your actual calibration! ---
+camera_matrix:
+  rows: 3
+  cols: 3
+  data: [305.5716,    0.    ,  320.5,
+         0.    ,  305.5716,  240.5,
+         0.    ,    0.    ,    1.    ]
+distortion_coefficients:
+  rows: 1
+  cols: 5
+  data: [-0.28340811, 0.07334586, 0.0009354 , -0.00011173, 0.        ]
+homography_matrix: # Example - Replace with yours!
+  rows: 3
+  cols: 3
+  data: [-0.0018, -0.0088,  0.3182,
+         -0.0001, -0.0181,  0.1219,
+         -0.0000, -0.0436,  1.0000]
+camera_offset_x: 0.05
+camera_offset_y: 0.0
+camera_offset_z: 0.1

@@ -1,0 +1,32 @@
+<launch>
+
+  <node pkg="Localization" type="duckie_odom_converter.py" name="duckie_odom_converter" output="screen">
+      </node>
+
+  <node pkg="Localization" type="imu_covariance_fixer.py" name="imu_covariance_fixer" output="screen">
+      </node>
+
+  <node pkg="robot_localization" type="ekf_localization_node" name="ekf_se_odom" clear_params="true">
+    <rosparam command="load" file="$(find Localization)/config/ekf_duckiebot.yaml" />
+  </node>
+  
+    <param name="/use_sim_time" value="false"/>
+
+    <node pkg="slam_loopclosure" type="line_status_detector_updated.py" name="line_parameter_detector" output="screen">
+        <rosparam command="load" file="$(find slam_loopclosure)/config/detector_params.yaml" />
+        </node>
+
+    <node pkg="slam_loopclosure" type="slam_mapper_node_updated.py" name="feature_mapper_node_tf" output="screen">
+        <rosparam command="load" file="$(find slam_loopclosure)/config/mapper_params.yaml" />
+        <remap from="~lines" to="/line_parameter_detector/lines"/>
+        </node>
+
+    <node pkg="slam_loopclosure" type="pose_graph_optimizer_node.py" name="pose_graph_optimizer_node" output="screen">
+        <rosparam command="load" file="$(find slam_loopclosure)/config/optimizer_params.yaml" />
+        <remap from="~odometry/filtered" to="/odometry/filtered"/> <remap from="~lines" to="/line_parameter_detector/lines"/>
+        </node>
+
+
+
+
+</launch>

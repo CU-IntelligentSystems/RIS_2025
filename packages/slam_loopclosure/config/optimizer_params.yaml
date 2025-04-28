@@ -1,0 +1,23 @@
+# Parameters for pose_graph_optimizer_node.py
+odom_frame_id: "odom"
+map_frame_id: "map"
+base_frame_id: "ente/base"
+
+keyframe_dist_thresh: 0.3
+keyframe_angle_thresh: 0.1745 # 10 degrees
+
+loop_closure_dist_thresh: 0.7
+loop_closure_min_keyframes_apart: 20
+loop_closure_max_candidates: 3
+
+icp_max_iterations: 20
+icp_tolerance: 0.001
+icp_max_correspondence_dist: 0.2
+icp_min_inliers: 5
+icp_line_sampling_dist: 0.05
+icp_line_segment_length: 0.3
+
+# --- Noise Sigmas (stddev): [x, y, theta] ---
+# Adjust based on testing!
+odom_noise_sigmas: [0.05, 0.05, 0.0349] # [m, m, rad (~2 deg)]
+lc_noise_sigmas: [0.1, 0.1, 0.0873]   # [m, m, rad (~5 deg)]
