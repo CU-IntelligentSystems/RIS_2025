@@ -13,10 +13,10 @@ from nav_msgs.msg import Odometry, OccupancyGrid
 from geometry_msgs.msg import Pose, Point, Quaternion
 from std_msgs.msg import Int8, Header
 
-class SlamMapperNode: 
+class SlamMapperNode: # CHANGED CLASS NAME
     def __init__(self):
-        node_name = 'slam_mapper_node'
-        rospy.init_node(node_name, anonymous=True) 
+        node_name = 'slam_mapper_node' # CHANGED NODE NAME
+        rospy.init_node(node_name, anonymous=True) # CHANGED NODE NAME
         rospy.loginfo(f"[{node_name}] Initializing...")
 
         # --- Parameters ---
@@ -51,7 +51,7 @@ class SlamMapperNode:
         # --- ROS Comms ---
         self.map_pub = rospy.Publisher("/map", OccupancyGrid, queue_size=1, latch=True)
         self.odom_sub = rospy.Subscriber("/odometry/filtered", Odometry, self.odom_callback, queue_size=1)
-        
+        # Remap these topics in the launch file if the detector node has a different name/namespace
         self.left_status_sub = rospy.Subscriber("~line/left/status", Int8, self.left_status_callback, queue_size=1)
         self.right_status_sub = rospy.Subscriber("~line/right/status", Int8, self.right_status_callback, queue_size=1)
         self.map_publish_timer = rospy.Timer(rospy.Duration(1.0 / self.map_publish_rate), self.publish_map)
@@ -71,7 +71,7 @@ class SlamMapperNode:
         self.right_line_status = msg.data
 
     def world_to_map_coords(self, world_x, world_y):
-        
+        # (Same as before)
         if self.map_resolution == 0: return None, None
         map_x = int(round((world_x - self.map_origin_x) / self.map_resolution))
         map_y = int(round((world_y - self.map_origin_y) / self.map_resolution))
@@ -80,7 +80,7 @@ class SlamMapperNode:
         else: return None, None
 
     def update_map_based_on_status(self):
-
+        # (Same as before)
         if self.current_pose is None: return
         pos = self.current_pose.position; orient_q = self.current_pose.orientation
         orient_list = [orient_q.x, orient_q.y, orient_q.z, orient_q.w]
@@ -110,7 +110,7 @@ class SlamMapperNode:
                                 self.map_data[adj_y, adj_x] = val
 
     def publish_map(self, event=None):
-
+        # (Same as before)
         map_msg = OccupancyGrid()
         map_msg.header.stamp = rospy.Time.now(); map_msg.header.frame_id = self.map_frame_id
         map_msg.info.map_load_time = map_msg.header.stamp; map_msg.info.resolution = self.map_resolution
@@ -123,7 +123,7 @@ class SlamMapperNode:
 
 if __name__ == '__main__':
     try:
-        mapper = SlamMapperNode() 
+        mapper = SlamMapperNode() # CHANGED CLASS NAME
         rospy.spin()
     except rospy.ROSInterruptException:
         rospy.loginfo("Grid mapper node shut down.")

@@ -12,13 +12,13 @@ print_diagnostics: true  # Useful for debugging
 # Coordinate Frames (standard Duckiebot frames)
 map_frame: map           # Ignored if map->odom transform is not published by this node
 odom_frame: odom         # Frame for continuous but drifting odometry
-base_link_frame: $(arg veh)/base # Robot's main frame
+base_link_frame: ente/base # Robot's main frame
 world_frame: odom        # Set to odom_frame to publish odom->base_link transform
 
 # --- Sensor Inputs ---
 
 # Wheel Odometry
-odom0: /$(arg veh)/odom_converted # <<< ADJUST hostname/topic name!
+odom0: /ente/odom_converted # <<< ADJUST hostname/topic name!
 #odom0_config: [false, false, false, false, false, false, true, false, false, false, false, true, false, false, false]
 odom0_config: [false, false, false, false, false, false, true, false, false, false, false, false, false, false, false]
 odom0_queue_size: 2
@@ -27,7 +27,7 @@ odom0_differential: false    # Check if your odom msg pose is absolute (false) o
 odom0_relative: false
 
 # IMU Data
-imu0: /$(arg veh)/imu_node/data_fixed  # <<< Use the topic from your relay node
+imu0: /ente/imu_node/data_fixed  # <<< Use the topic from your relay node
 imu0_config: [false, false, false,  # X, Y, Z   (No position from IMU)
              false, false, false,  # Roll, Pitch, Yaw (Orientation is invalid, set all false)
              false, false, false,  # Vx, Vy, Vz  (No velocity from IMU)
