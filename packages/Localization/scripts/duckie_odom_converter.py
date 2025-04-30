@@ -12,13 +12,17 @@ class DuckieOdomConverter:
     def __init__(self):
         rospy.init_node('duckie_odom_converter', anonymous=True)
 
+        self.veh = rospy.get_param("~veh","ente")
+
         # --- Parameters ---
         self.odom_frame = rospy.get_param('~odom_frame', 'odom')
-        self.base_frame = rospy.get_param('~base_frame', 'ente/base')
+        self.base_frame = rospy.get_param('~base_frame', f'{self.veh}/base')
         self.publish_rate = rospy.get_param('~publish_rate', 30.0)
 
-        self.radius = rospy.get_param('/ente/kinematics_node/radius', 0.0318)
-        self.baseline = rospy.get_param('/ente/kinematics_node/baseline', 0.1)
+        kinematics_node = f'/{self.veh}/kinematics_node'
+
+        self.radius = rospy.get_param(f'{kinematics_node}/radius', 0.0318)
+        self.baseline = rospy.get_param(f'{kinematics_node}/baseline', 0.1)
         self.ticks_per_rev = rospy.get_param('~ticks_per_revolution', 135.0)
 
         if self.ticks_per_rev <= 0: rospy.logerr("ticks_per_revolution must be positive."); exit()
@@ -53,18 +57,23 @@ class DuckieOdomConverter:
         self.data_lock = Lock() # Protect access when callbacks update data
 
         # --- Publishers ---
-        self.odom_pub = rospy.Publisher('/ente/odom_converted', Odometry, queue_size=10)
+        
+        self.odom_pub = rospy.Publisher(f'/{self.veh}/odom_converted', Odometry, queue_size=10)
 
         # --- Subscribers ---
-        rospy.Subscriber('/ente/left_wheel_encoder_node/tick', WheelEncoderStamped, self.left_encoder_callback, queue_size=5)
-        rospy.Subscriber('/ente/right_wheel_encoder_node/tick', WheelEncoderStamped, self.right_encoder_callback, queue_size=5)
+        left_encoder_topic = f"/{self.veh}/left_wheel_encoder_node/tick"
+        right_encoder_topic = f"/{self.veh}/right_wheel_encoder_node/tick"
+        rospy.Subscriber(left_encoder_topic, WheelEncoderStamped, self.left_encoder_callback, queue_size=5)
+        rospy.Subscriber(right_encoder_topic, WheelEncoderStamped, self.right_encoder_callback, queue_size=5)
+        rospy.loginfo(f"[{rospy.get_name()}] Subscribing to: {left_encoder_topic}")
+        rospy.loginfo(f"[{rospy.get_name()}] Subscribing to: {right_encoder_topic}")
 
         # --- Timer ---
         self.timer = rospy.Timer(rospy.Duration(1.0/self.publish_rate), self.publish_odometry)
 
         rospy.loginfo("Duckie Odometry Converter Initialized (v3 - Single Print).")
         rospy.loginfo(f"  Using radius={self.radius}, baseline={self.baseline}, ticks_per_rev={self.ticks_per_rev}")
-        rospy.loginfo(f"  Publishing to /ente/odom_converted")
+        
 
     def left_encoder_callback(self, msg):
         with self.data_lock:

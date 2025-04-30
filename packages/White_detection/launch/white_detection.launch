@@ -1,22 +1,25 @@
 <launch>
 
-    <arg name="veh" default="ente"/>
+    <arg name="veh" default="ente" doc="Name of the duckiebot being used"/>
 
     <node pkg="White_detection" type="line_status_detector.py" name="line_status_detector" output="screen">
-                                  <rosparam param="hsv_lower_white">[0, 0, 150]</rosparam> <rosparam param="hsv_upper_white">[180, 80, 255]</rosparam> <rosparam param="hsv_lower_yellow">[20, 100, 100]</rosparam>
+        <rosparam param="hsv_lower_white">[0, 0, 150]</rosparam> 
+        <rosparam param="hsv_upper_white">[180, 80, 255]</rosparam> 
+        <rosparam param="hsv_lower_yellow">[20, 100, 100]</rosparam>
         <rosparam param="hsv_upper_yellow">[40, 255, 255]</rosparam>
 
+        <param name="veh" value="$(arg veh)" />
         <param name="roi_bottom_width_frac" value="0.9" type="double"/>
         <param name="roi_top_width_frac"    value="0.1" type="double"/>
         <param name="roi_height_frac"       value="0.4" type="double"/> <param name="blur_ksize"        value="5" type="int"/>
-         <param name="canny_low_thresh"  value="50" type="int"/>
-          <param name="canny_high_thresh" value="150" type="int"/> 
-          <param name="hough_rho"            value="1" type="int"/>
+        <param name="canny_low_thresh"  value="50" type="int"/>
+        <param name="canny_high_thresh" value="150" type="int"/> 
+        <param name="hough_rho"            value="1" type="int"/>
         <param name="hough_theta"          value="0.01745329" type="double"/> 
         <param name="hough_threshold"      value="15" type="int"/> 
         <param name="hough_min_line_len"   value="15" type="int"/> 
         <param name="hough_max_line_gap"   value="5" type="int"/>
-         <param name="min_line_slope_abs"   value="0.3" type="double"/>
+        <param name="min_line_slope_abs"   value="0.3" type="double"/>
 
         </node>
 
