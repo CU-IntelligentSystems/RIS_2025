@@ -2,6 +2,7 @@
 import rospy
 import numpy as np
 import cv2, yaml, os
+
 from std_srvs.srv import Empty, EmptyResponse
 from nav_msgs.msg import OccupancyGrid
 
@@ -23,10 +24,17 @@ class MapSaverNode:
         self.srv = rospy.Service('~save_map', Empty,
                                  self.handle_save_map)
         rospy.loginfo(f"[map_saver] Listening on {self.map_topic}")
+        rospy.on_shutdown(self._on_shutdown_save)
         rospy.spin()
+
+    def _on_shutdown_save(self):
+        if self.latest_map is not None:
+            rospy.loginfo("[map_saver] Auto-saving map on shutdown…")
+            self._dump_to_disk(self.latest_map)
 
     def map_callback(self, msg: OccupancyGrid):
         self.latest_map = msg
+        self._dump_to_disk(msg)
 
     def handle_save_map(self, req):
         if self.latest_map is None:
@@ -49,28 +57,32 @@ class MapSaverNode:
         img[arr == 100] =   0
         img[arr == -1] = 205
 
-        #paths
-        pgm_fp  = os.path.join(self.output_dir,
-                               self.map_name + '.pgm')
-        yaml_fp = os.path.join(self.output_dir,
-                               self.map_name + '.yaml')
-        
-        #files
-        cv2.imwrite(pgm_fp, img)
-        meta = {
-            'image': os.path.basename(pgm_fp),
-            'resolution': grid.info.resolution,
-            'origin': [grid.info.origin.position.x,
-                       grid.info.origin.position.y,
-                       0.0],
-            'negate':  0,
-            'occupied_thresh': 0.65,
-            'free_thresh':     0.20
-        }
-        
-        with open(yaml_fp, 'w') as f:
-            yaml.dump(meta, f, default_flow_style=False)
-        rospy.loginfo(f"[map_saver] Map saved to {pgm_fp} + {yaml_fp}")
+        #timestamp to avoid overwriting previous data
+        ts = int(rospy.Time.now().to_sec())
+        base = f"{self.map_name}_{ts}"
+        pgm_fp = os.path.join(self.output_dir, base + '.pgm')
+        yaml_fp = os.path.join(self.output_dir, base + '.yaml')
+
+        #attempt write files
+        try:
+            cv2.imwrite(pgm_fp, img)
+            meta = {
+                'image': os.path.basename(pgm_fp),
+                'resolution': grid.info.resolution,
+                'origin': [
+                    grid.info.origin.position.x,
+                    grid.info.origin.position.y,
+                    0.0
+                ],
+                'negate': 0,
+                'occupied_thresh': 0.65,
+                'free_thresh': 0.20
+            }
+            with open(yaml_fp, 'w') as f:
+                yaml.dump(meta, f, default_flow_style=False)
+            rospy.loginfo(f"[map_saver] Map saved to {pgm_fp} + {yaml_fp}")
+        except Exception as e:
+            rospy.logerr(f"[map_saver] Failed to save map: {e}")
 
 if __name__ == '__main__':
     try:
