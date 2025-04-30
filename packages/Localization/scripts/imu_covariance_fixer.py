@@ -7,13 +7,15 @@ class ImuCovarianceFixer:
     def __init__(self):
         rospy.init_node('imu_covariance_fixer', anonymous=True)
 
+        self.veh = rospy.get_param("~veh","ente")
+
         # --- Parameters ---
         # Input topic (original IMU data)
-        self.input_topic = rospy.get_param('~input_topic', '/ente/imu_node/data')
+        self.input_topic = rospy.get_param('~input_topic', f'/{self.veh}/imu_node/data')
         # Output topic (IMU data with fixed covariances)
-        self.output_topic = rospy.get_param('~output_topic', '/ente/imu_node/data_fixed')
+        self.output_topic = rospy.get_param('~output_topic', f'/{self.veh}/imu_node/data_fixed')
 
-        # Fixed covariance values (Variances on the diagonal) - TUNE THESE!
+        # Fixed covariance values (Variances on the diagonal) 
         # Angular velocity (roll, pitch, yaw rates) variance
         cov_vv = rospy.get_param('~angular_velocity_variance', 0.001) # e.g., (0.03 rad/s)^2
         # Linear acceleration (x, y, z) variance

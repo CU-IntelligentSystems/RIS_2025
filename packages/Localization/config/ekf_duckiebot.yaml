@@ -4,21 +4,21 @@
 # General filter settings
 frequency: 30.0          # Target update rate (Hz)
 sensor_timeout: 0.1      # Sensor data timeout (seconds)
-two_d_mode: true         # CRITICAL: Set true for Duckiebot on a flat surface
+two_d_mode: true         # on ground 
 publish_tf: true         # Publish the odom->base_link transform
-publish_acceleration: false # Usually false unless needed and tuned
-print_diagnostics: true  # Useful for debugging
+publish_acceleration: false 
+print_diagnostics: true  
 
 # Coordinate Frames (standard Duckiebot frames)
 map_frame: map           # Ignored if map->odom transform is not published by this node
 odom_frame: odom         # Frame for continuous but drifting odometry
-base_link_frame: ente/base # Robot's main frame
+base_link_frame: $(arg veh)/base # Robot's main frame
 world_frame: odom        # Set to odom_frame to publish odom->base_link transform
 
 # --- Sensor Inputs ---
 
 # Wheel Odometry
-odom0: /ente/odom_converted 
+odom0: /$(arg veh)/odom_converted 
 
 odom0_config: [false, false, false, false, false, false, true, false, false, false, false, false, false, false, false]
 odom0_queue_size: 2
@@ -27,7 +27,7 @@ odom0_differential: false
 odom0_relative: false
 
 # IMU Data
-imu0: /ente/imu_node/data_fixed  # <<< Use the topic from your relay node
+imu0: /$(arg veh)/imu_node/data_fixed  # <<< Use the topic from your relay node
 imu0_config: [false, false, false,  # X, Y, Z   (No position from IMU)
              false, false, false,  # Roll, Pitch, Yaw (Orientation is invalid, set all false)
              false, false, false,  # Vx, Vy, Vz  (No velocity from IMU)
@@ -56,7 +56,5 @@ process_noise_covariance: [0.05, 0,    0,    0,    0,    0,    0,    0,    0,   
                            0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0.01, 0,    0,  # Ax
                            0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0.01, 0,  # Ay
                            0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0.01] # Az
-# --- Initial State --- (Optional, defaults to zeros)
-# initial_state: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
-# --- END --- Reminder: Check sensor message covariances from your Duckiebot nodes! ---
+
