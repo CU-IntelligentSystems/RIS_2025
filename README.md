@@ -12,10 +12,10 @@ This project implements and explores Simultaneous Localization and Mapping (SLAM
 1.  **Clone the Repository:**
     Get the project code onto your local machine.
     ```bash
-    # Replace <your-repository-url> with the actual URL
-    git clone <your-repository-url>
-    cd <repository-directory-name>
+    git clone https://github.com/Thendyom/ente-ros
+    cd
     ```
+   into the directory where you cloned it
 
 2.  **Configure Your Duckiebot Name:**
     Before building, you need to tell the project the hostname of *your* specific Duckiebot. You must replace the default name (`ente`) with your bot's name in the following files:
