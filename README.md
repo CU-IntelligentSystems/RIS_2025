@@ -1,47 +1,56 @@
-# Template: template-ros
+# EKF-SLAM in Duckietown World
 
-This template provides a boilerplate repository
-for developing ROS-based software in Duckietown.
+This project implements and explores Simultaneous Localization and Mapping (SLAM) techniques on a Duckiebot platform. It combines Extended Kalman Filter (EKF) based localization with visual lane detection to create a map of the Duckiebot's environment.
 
-**NOTE:** If you want to develop software that does not use
-ROS, check out [this template](https://github.com/duckietown/template-basic).
+## Prerequisites
 
+* You must have the Duckietown development environment (Duckietown Shell, `dts`) installed and configured on your system. Please refer to the official [Duckietown documentation](https://docs.duckietown.org/) if you haven't set this up yet.
+* A configured Duckiebot (either real or simulated) with a known hostname.
 
-## How to use it
+## Installation & Setup
 
-### 1. Fork this repository
+1.  **Clone the Repository:**
+    Get the project code onto your local machine.
+    ```bash
+    # Replace <your-repository-url> with the actual URL
+    git clone <your-repository-url>
+    cd <repository-directory-name>
+    ```
 
-Use the fork button in the top-right corner of the github page to fork this template repository.
+2.  **Configure Your Duckiebot Name:**
+    Before building, you need to tell the project the hostname of *your* specific Duckiebot. You must replace the default name (`ente`) with your bot's name in the following files:
 
+    * **File:** `packages/White_detection/launch/white_detection.launch`
+        * **Find:** `<arg name="veh" default="ente" ... />`
+        * **Change `ente`** to `YOUR_DUCKIEBOT_NAME`
 
-### 2. Create a new repository
+    * **File:** `packages/localization/launch/duckiebot_localization.launch`
+        * **Find:** `<arg name="veh" default="ente" ... />`
+        * **Change `ente`** to `YOUR_DUCKIEBOT_NAME`
 
-Create a new repository on github.com while
-specifying the newly forked template repository as
-a template for your new repository.
+    * **File:** `it_begins.sh`
+        * **Find:** `LAUNCH_CMD="roslaunch slam slam_pipeline.launch veh:=ente"`
+        * **Change `ente`** to `YOUR_DUCKIEBOT_NAME`
 
+    *(Remember to replace `YOUR_DUCKIEBOT_NAME` with the actual hostname!)*
 
-### 3. Define dependencies
+## Building the Docker Image
 
-List the dependencies in the files `dependencies-apt.txt` and
-`dependencies-py3.txt` (apt packages and pip packages respectively).
+Now, build the Docker image required to run the code using the Duckietown Shell. Make sure to specify your Duckiebot's hostname using the `-H` flag. The `-f` flag forces a rebuild if needed.
 
+```bash
+# Replace YOUR_DUCKIEBOT_NAME with your bot's actual hostname
+dts devel build -H YOUR_DUCKIEBOT_NAME -f
 
-### 4. Place your code
+Then run the system
+dts devel run -H YOUR_DUCKIEBOT_NAME -L it_begins
 
-Place your code in the directory `/packages/` of
-your new repository.
+## Viewing
+1) Open a new terminal and type dts start_gui_tools
+2) Then type rosrun rviz rviz 
+3) Switch to odom frame
+4) Add TF data and open \map topic
+5) Et voila! You can start to play around with your bot 
 
-
-### 5. Setup launchers
-
-The directory `/launchers` can contain as many launchers (launching scripts)
-as you want. A default launcher called `default.sh` must always be present.
-
-If you create an executable script (i.e., a file with a valid shebang statement)
-a launcher will be created for it. For example, the script file 
-`/launchers/my-launcher.sh` will be available inside the Docker image as the binary
-`dt-launcher-my-launcher`.
-
-When launching a new container, you can simply provide `dt-launcher-my-launcher` as
-command.
+If you want to view the line detector output 
+- Run rqt_image_view and observe the corresponding topics (line_status_detector/image/line_overlay)
