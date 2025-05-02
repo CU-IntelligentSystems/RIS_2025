@@ -1,0 +1,36 @@
+<launch>
+  <!-- AntiInstagram node to compute color thresholds -->
+  <node pkg="image_processing" type="anti_insta_node.py" 
+        name="anti_instagram_node" output="screen">
+    <param name="~device" value="/dev/video0" />
+  </node>
+
+  <!-- White Line Detector & Follower -->
+  <node pkg="line_detection" type="line_detection_node.py"
+        name="white_line_detector_follower" output="screen">
+    <!-- Image topic remap if needed -->
+    <remap from="~image/compressed" to="/camera/image/compressed"/>
+    <remap from="~thresholds"    to="/anti_instagram_node/thresholds"/>
+
+    <!-- Tunable parameters -->
+    <param name="~hsv_lower"    value="[0,0,200]" />
+    <param name="~hsv_upper"    value="[180,50,255]" />
+    <param name="~roi_fraction" value="0.5" />
+    <param name="~top_cutoff"   value="0" />
+
+    <!-- Hough settings -->
+    <param name="~hough_threshold" value="50" />
+    <param name="~hough_min_line"  value="50" />
+    <param name="~hough_max_gap"   value="20" />
+
+    <!-- Control gains -->
+    <param name="~Kp_pos"   value="0.005" />
+    <param name="~Kp_ang"   value="1.0" />
+    <param name="~v_straight" value="0.2" />
+    <param name="~v_turn"     value="0.1" />
+    <param name="~err_thresh" value="20.0" />
+
+    <!-- Debug -->
+    <param name="~debug" value="true" />
+  </node>
+</launch>
