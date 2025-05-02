@@ -5,6 +5,7 @@
 # the static TF override, and the mapping node.
 
 # Source the Duckietown environment variables and ROS setup within the container
+VEH="${1:-$(hostname)}"
 echo "Sourcing environment..."
 source /environment.sh
 
@@ -13,7 +14,7 @@ dt-launchfile-init
 
 # this is what we want to launch 
 # veh is a variable for the name of the bot
-LAUNCH_CMD="roslaunch slam slam_pipeline.launch veh:=ente"
+LAUNCH_CMD="roslaunch slam slam_pipeline.launch veh:=${veh}"
 
 # Print the command we are about to run
 echo "Executing: ${LAUNCH_CMD}"
