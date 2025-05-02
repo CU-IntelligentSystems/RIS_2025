@@ -1,5 +1,5 @@
 <launch>
-    <arg name="veh" default="ente" doc="Name of the Duckiebot being used"/>
+    <arg name="veh" default="$(env HOSTNAME)" doc="Name of the Duckiebot being used"/>
     
     <node pkg="Localization" type="duckie_odom_converter.py" name="duckie_odom_converter" output="screen">
         <param name="veh" value="$(arg veh)" />
