@@ -4,7 +4,7 @@
 # Description: Detects white and yellow line segments in the BOTTOM HALF of image
 #              using masked Canny+Hough. Averages segments for left/right lines
 #              for each color. Publishes the status (White=0, Yellow=1, None=-1)
-#              for each side. Publishes debug images. NO ROI, NO projection.
+#              for each side. Publishes debug images.
 
 import rospy
 import cv2
@@ -12,20 +12,21 @@ import numpy as np
 import math
 
 # ROS Msgs
-from sensor_msgs.msg import CompressedImage, Image # Only need Image for debug publish
-from std_msgs.msg import Int8, Header # Use Int8 for status
-
+from sensor_msgs.msg import CompressedImage, Image
+from std_msgs.msg import Int8, Header 
 # ROS Tools
 from cv_bridge import CvBridge, CvBridgeError
-# TF/Projection related imports REMOVED
+
 
 class LineStatusDetectorNoROI:
     def __init__(self):
         node_name = 'line_status_detector_no_roi'
         rospy.init_node(node_name, anonymous=True)
 
+        self.veh = rospy.get_param("~veh","ente")
+
         # --- Parameters ---
-        # HSV Thresholds (MUST BE SET IN LAUNCH FILE!)
+        # HSV Thresholds 
         try:
             self.hsv_lower_white = np.array(rospy.get_param("~hsv_lower_white", [0, 0, 150]), dtype=np.uint8)
             self.hsv_upper_white = np.array(rospy.get_param("~hsv_upper_white", [180, 80, 255]), dtype=np.uint8)
@@ -36,7 +37,7 @@ class LineStatusDetectorNoROI:
              rospy.signal_shutdown("Invalid HSV parameters.")
              return
 
-        # ROI Parameters REMOVED
+
         # Processing
         self.blur_ksize = rospy.get_param("~blur_ksize", 5)
         self.canny_low_thresh = rospy.get_param("~canny_low_thresh", 50)
@@ -50,15 +51,13 @@ class LineStatusDetectorNoROI:
         # Line Filtering
         self.min_line_slope_abs = rospy.get_param("~min_line_slope_abs", 0.3)
 
-        rospy.loginfo(f"[{node_name}] Parameters Initialized (No ROI filtering).")
+        rospy.loginfo(f"[{node_name}] Parameters Initialized.")
         rospy.loginfo(f"[{node_name}] HSV White Low: {self.hsv_lower_white} High: {self.hsv_upper_white}")
         rospy.loginfo(f"[{node_name}] HSV Yellow Low: {self.hsv_lower_yellow} High: {self.hsv_upper_yellow}")
 
 
         # --- ROS Comms ---
         self.bridge = CvBridge()
-        # No TF or CameraModel needed
-
         # Publishers
         self.left_status_pub = rospy.Publisher("~line/left/status", Int8, queue_size=1)
         self.right_status_pub = rospy.Publisher("~line/right/status", Int8, queue_size=1)
@@ -68,8 +67,8 @@ class LineStatusDetectorNoROI:
         self.pub_color_filtered_edges = rospy.Publisher("~image/color_filtered_edges", Image, queue_size=2)
         self.pub_line_overlay = rospy.Publisher("~image/line_overlay", Image, queue_size=2)
 
-        # --- Subscriber (Just Image) ---
-        image_topic = "/ente/camera_node/image/compressed" # Use correct topic name
+        # --- Subscriber ---
+        image_topic = f"/{self.veh}/camera_node/image/compressed"
         self.image_sub = rospy.Subscriber(image_topic, CompressedImage,
                                           self.image_callback, queue_size=1, buff_size=2**24)
 
@@ -78,7 +77,7 @@ class LineStatusDetectorNoROI:
 
     # --- Helper Functions ---
     def get_line_points(self, y, line_params):
-        # Still needed for drawing the overlay
+        # needed for drawing the overlay
         if line_params is None: return None
         vx, vy, x0, y0 = line_params[0], line_params[1], line_params[2], line_params[3]
         if abs(vy) < 1e-6: return None
@@ -86,7 +85,7 @@ class LineStatusDetectorNoROI:
         return int(round(x))
 
     def average_lines(self, lines, img_shape):
-        # (Same average_lines function as before - classifies L/R based on img_shape width)
+    
         node_name = rospy.get_name(); left_points = []; right_points = []
         height, width = img_shape[:2]; img_center_x = width / 2.0
         if lines is None: return None, None
@@ -106,7 +105,7 @@ class LineStatusDetectorNoROI:
             elif slope > 0 and x1 > img_center_x and x2 > img_center_x:
                 right_points.extend([(x1, y1), (x2, y2)]); classified_right += 1
 
-        # Log filtering/classification summary (use logdebug to reduce spam)
+        # Log filtering/classification summary which reduces spam
         rospy.logdebug(f"[{node_name}/avg] Raw:{len(lines)} Filt(HV:{filtered_hv},Slope:{filtered_slope}) Class(L:{classified_left}/R:{classified_right}) Pts(L:{len(left_points)}/R:{len(right_points)})")
 
         left_line_params = None; right_line_params = None
@@ -134,7 +133,7 @@ class LineStatusDetectorNoROI:
         # --- Image Processing ---
         height, width, _ = cv_image.shape; height_half = height // 2
         img_bottom = cv_image[height_half:height, :]
-        crop_h, crop_w = img_bottom.shape[:2] # Get dimensions of cropped image
+        crop_h, crop_w = img_bottom.shape[:2] # Gets dimensions of cropped image
 
         # Create Masks
         hsv_image = cv2.cvtColor(img_bottom, cv2.COLOR_BGR2HSV)
@@ -150,7 +149,6 @@ class LineStatusDetectorNoROI:
         white_edges = cv2.bitwise_and(edges, edges, mask=white_mask)
         yellow_edges = cv2.bitwise_and(edges, edges, mask=yellow_mask)
 
-        # --- ROI Masking REMOVED ---
         # Combine edges for debug view
         all_color_filtered_edges = cv2.bitwise_or(white_edges, yellow_edges)
 
@@ -188,7 +186,7 @@ class LineStatusDetectorNoROI:
         line_img = np.zeros_like(img_bottom)
         y_bottom_crop = crop_h - 1; y_top_crop = int(crop_h * 0.6) # Define Y levels for drawing avg lines
 
-        # Draw raw segments (White=Gray, Yellow=Light Yellow/Cyan)
+        # Drawing raw segments (White=Gray, Yellow=Light Yellow/Cyan)
         if white_lines is not None:
             for line in white_lines: cv2.line(line_img, (line[0][0], line[0][1]), (line[0][2], line[0][3]), (200, 200, 200), 1)
         if yellow_lines is not None:
@@ -208,7 +206,6 @@ class LineStatusDetectorNoROI:
              x_bottom = self.get_line_points(y_bottom_crop, yellow_right_params); x_top = self.get_line_points(y_top_crop, yellow_right_params)
              if x_bottom is not None and x_top is not None: cv2.line(line_img, (x_bottom, y_bottom_crop), (x_top, y_top_crop), (255, 255, 0), 3) # Cyan
 
-        # ROI drawing REMOVED
         combined_img = cv2.addWeighted(img_bottom, 0.8, line_img, 1.0, 0.0)
 
         try:

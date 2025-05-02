@@ -12,13 +12,15 @@ class DuckieOdomConverter:
     def __init__(self):
         rospy.init_node('duckie_odom_converter', anonymous=True)
 
+        self.veh = rospy.get_param("~veh","ente")
+
         # --- Parameters ---
         self.odom_frame = rospy.get_param('~odom_frame', 'odom')
-        self.base_frame = rospy.get_param('~base_frame', 'ente/base')
+        self.base_frame = rospy.get_param('~base_frame', f'{self.veh}/base')
         self.publish_rate = rospy.get_param('~publish_rate', 30.0)
 
-        self.radius = rospy.get_param('/ente/kinematics_node/radius', 0.0318)
-        self.baseline = rospy.get_param('/ente/kinematics_node/baseline', 0.1)
+        self.radius = rospy.get_param(f'/{self.veh}/kinematics_node/radius', 0.0318)
+        self.baseline = rospy.get_param(f'/{self.veh}/kinematics_node/baseline', 0.1)
         self.ticks_per_rev = rospy.get_param('~ticks_per_revolution', 135.0)
 
         if self.ticks_per_rev <= 0: rospy.logerr("ticks_per_revolution must be positive."); exit()
@@ -27,7 +29,7 @@ class DuckieOdomConverter:
 
         self.dist_per_tick = (2.0 * math.pi * self.radius) / self.ticks_per_rev
 
-        # --- Covariance Parameters (Tune These!) ---
+        # --- Covariance Parameters 
         self.pose_cov_x = rospy.get_param('~pose_covariance/x', 1e-4) # Using smaller test values
         self.pose_cov_y = rospy.get_param('~pose_covariance/y', 1e-4)
         self.pose_cov_yaw = rospy.get_param('~pose_covariance/yaw', 1e-5)
@@ -53,18 +55,18 @@ class DuckieOdomConverter:
         self.data_lock = Lock() # Protect access when callbacks update data
 
         # --- Publishers ---
-        self.odom_pub = rospy.Publisher('/ente/odom_converted', Odometry, queue_size=10)
+        self.odom_pub = rospy.Publisher(f'/{self.veh}/odom_converted', Odometry, queue_size=10)
 
         # --- Subscribers ---
-        rospy.Subscriber('/ente/left_wheel_encoder_node/tick', WheelEncoderStamped, self.left_encoder_callback, queue_size=5)
-        rospy.Subscriber('/ente/right_wheel_encoder_node/tick', WheelEncoderStamped, self.right_encoder_callback, queue_size=5)
+        rospy.Subscriber(f'/{self.veh}/left_wheel_encoder_node/tick', WheelEncoderStamped, self.left_encoder_callback, queue_size=5)
+        rospy.Subscriber(f'/{self.veh}/right_wheel_encoder_node/tick', WheelEncoderStamped, self.right_encoder_callback, queue_size=5)
 
         # --- Timer ---
         self.timer = rospy.Timer(rospy.Duration(1.0/self.publish_rate), self.publish_odometry)
 
         rospy.loginfo("Duckie Odometry Converter Initialized (v3 - Single Print).")
         rospy.loginfo(f"  Using radius={self.radius}, baseline={self.baseline}, ticks_per_rev={self.ticks_per_rev}")
-        rospy.loginfo(f"  Publishing to /ente/odom_converted")
+        rospy.loginfo(f"  Publishing to /{self.veh}/odom_converted")
 
     def left_encoder_callback(self, msg):
         with self.data_lock:
@@ -155,9 +157,8 @@ class DuckieOdomConverter:
             self.twist_cov_vx, 1e-9, 1e-9, 1e-9, 1e-9, self.twist_cov_vyaw
         ]).flatten().tolist()
 
-        # --- THE SINGLE DEBUG PRINT ---
         rospy.loginfo(f"Publishing Odom: X={odom.pose.pose.position.x:.3f} Y={odom.pose.pose.position.y:.3f} Th={self.theta:.3f} Vx={odom.twist.twist.linear.x:.3f} Vyaw={odom.twist.twist.angular.z:.3f}")
-        # --- END DEBUG PRINT ---
+    
 
         try:
             self.odom_pub.publish(odom)
@@ -168,7 +169,7 @@ class DuckieOdomConverter:
         self.last_update_time = current_time
         self.last_calc_ticks_left = calc_ticks_left
         self.last_calc_ticks_right = calc_ticks_right
-        # Update associated stamps as well (might not be strictly needed if only using last_update_time)
+        # Update associated stamps as well
         self.last_calc_stamp_left = calc_stamp_left
         self.last_calc_stamp_right = calc_stamp_right
 

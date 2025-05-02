@@ -1,13 +1,17 @@
 <launch>
+    <arg name="veh" default="ente" doc="Name of the Duckiebot being used"/>
+    
+    <node pkg="Localization" type="duckie_odom_converter.py" name="duckie_odom_converter" output="screen">
+        <param name="veh" value="$(arg veh)" />
+        </node>
 
-  <node pkg="Localization" type="duckie_odom_converter.py" name="duckie_odom_converter" output="screen">
-      </node>
+    <node pkg="Localization" type="imu_covariance_fixer.py" name="imu_covariance_fixer" output="screen">
+        <param name="veh" value="$(arg veh)" />
+        </node>
 
-  <node pkg="Localization" type="imu_covariance_fixer.py" name="imu_covariance_fixer" output="screen">
-      </node>
-
-  <node pkg="robot_localization" type="ekf_localization_node" name="ekf_se_odom" clear_params="true">
-    <rosparam command="load" file="$(find Localization)/config/ekf_duckiebot.yaml" />
-  </node>
-
+    <node pkg="robot_localization" type="ekf_localization_node" name="ekf_se" clear_params="true">
+        <rosparam command="load"
+                  file="$(find Localization)/config/ekf_duckiebot.yaml"
+                  subst_value="true" />
+        </node>
 </launch>
