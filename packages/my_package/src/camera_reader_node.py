@@ -4,7 +4,7 @@ import os
 import rospy
 from duckietown.dtros import DTROS, NodeType
 from sensor_msgs.msg import CompressedImage
-from std_msgs.msg import Float32  # Import for distance publishing
+from std_msgs.msg import Float32  # Import for distance and detection status publishing
 
 import cv2
 from cv_bridge import CvBridge
@@ -29,8 +29,9 @@ class CameraReaderNode(DTROS):
         # construct subscriber
         self.sub = rospy.Subscriber(self._camera_topic, CompressedImage, self.callback)
 
-        # Publisher for object distance
+        # Publisher for object distance and detection status
         self.distance_pub = rospy.Publisher('/object_distance', Float32, queue_size=10)
+        self.detection_status_pub = rospy.Publisher('/object_detection_status', Float32, queue_size=10)
 
         # Define a reference object size and distance for scaling (adjust these values)
         self.reference_object_width = 0.01  # Real width of the duck in meters (5.5 cm)
@@ -47,12 +48,6 @@ class CameraReaderNode(DTROS):
         # Convert the image to HSV (Hue, Saturation, Value) color space
         hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
-        # Define the range for yellow color in HSV space
-        #lower_yellow = (20, 100, 100)  # Lower bound for yellow
-        #upper_yellow = (40, 255, 255)  # Upper bound for yellow
-
-        # Create a binary mask where yellow areas are white, others are black
-        #yellow_mask = cv2.inRange(hsv_image, lower_yellow, upper_yellow)
         # Define lower and upper bounds for red in HSV
         lower_red1 = (0, 100, 100)
         upper_red1 = (10, 255, 255)
@@ -67,38 +62,34 @@ class CameraReaderNode(DTROS):
         # Combine the masks
         red_mask = cv2.bitwise_or(mask1, mask2)
 
-
         # Perform some cleaning of the mask (optional)
         red_mask = cv2.morphologyEx(red_mask, cv2.MORPH_OPEN, None)
         red_mask = cv2.morphologyEx(red_mask, cv2.MORPH_CLOSE, None)
 
-        # Find contours of the yellow areas in the mask
+        # Find contours of the detected red areas in the mask
         contours, _ = cv2.findContours(red_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-        # Initialize variables for tracking the largest contour (yellow duck)
+        # Initialize variables for tracking the largest contour (red object)
         max_area = 0
         largest_contour = None
-        distance = None  # Variable to store the distance to the duck
+        distance = None  # Variable to store the distance to the detected object
 
-        # Draw bounding boxes around the detected yellow areas and calculate their area
+        # Draw bounding boxes around the detected areas and calculate their area
         for contour in contours:
             if cv2.contourArea(contour) > 100:  # Filter small contours
                 # Get the bounding box for the contour
                 x, y, w, h = cv2.boundingRect(contour)
-                # Draw a rectangle around the detected yellow area
+                # Draw a rectangle around the detected red area
                 cv2.rectangle(image, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
-                # Print the width of the bounding box (in pixels)
-                print(f"Bounding Box Width: {w} pixels")
-
-                # Keep track of the largest bounding box (assumed to be the duck)
+                # Keep track of the largest bounding box (assumed to be the red object)
                 if cv2.contourArea(contour) > max_area:
                     max_area = cv2.contourArea(contour)
                     largest_contour = contour
                     # Approximate the distance based on the size of the bounding box
                     distance = self.estimate_distance(w)  # Use width of bounding box to estimate distance
 
-        # If a yellow object (duck) is detected, show the estimated distance
+        # If an object (red) is detected, show the estimated distance
         if distance is not None:
             # Display the distance on the image (in meters)
             cv2.putText(image, f"Distance: {distance:.2f} m", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2, cv2.LINE_AA)
@@ -106,7 +97,16 @@ class CameraReaderNode(DTROS):
             # Publish the distance to the /object_distance topic
             self.distance_pub.publish(distance)
 
-        # Display the frame with bounding boxes around yellow areas and distance
+            # Publish detection status (1 for detected, 0 for not detected)
+            if distance < 1.0:  # Object is detected and within 1 meter range
+                self.detection_status_pub.publish(1.0)
+            else:
+                self.detection_status_pub.publish(0.0)
+        else:
+            # If no object is detected, send a detection status of 0.0
+            self.detection_status_pub.publish(0.0)
+
+        # Display the frame with bounding boxes around detected areas and distance
         cv2.imshow(self._window, image)
         cv2.waitKey(1)
 
