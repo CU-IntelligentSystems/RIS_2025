@@ -36,7 +36,7 @@ dts devel build -H YOUR_DUCKIEBOT_NAME -f
 
 Then run the system
 dts devel run -H YOUR_DUCKIEBOT_NAME -L it_begins
-``
+```
 ## Viewing
 1) Open a new terminal and type dts start_gui_tools
 2) Then type rosrun rviz rviz 
