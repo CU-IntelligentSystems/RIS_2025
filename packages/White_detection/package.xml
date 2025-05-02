@@ -3,7 +3,7 @@
   <name>White_detection</name>
   <version>0.1.0</version>
   <description>Detects white lane lines in the lower half of an image and projects them to the ground plane relative to the robot.</description> 
-  <maintainer email="your_email@example.com">Your Name</maintainer> 
+  <maintainer email="ramahiqais@gmail.com">Qais</maintainer> 
   <license>TODO</license> <buildtool_depend>catkin</buildtool_depend>
 
   <depend>rospy</depend>

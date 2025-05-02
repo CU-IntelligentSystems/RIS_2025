@@ -11,25 +11,23 @@ source /environment.sh
 # Initialize the Duckietown launch process
 dt-launchfile-init
 
-# --- Define the main launch command ---
-# Ensure 'slam' is your package name and 'slam_pipeline.launch' is your main launch file.
-# We pass 'veh:=ente' as the pipeline launch file might use it.
+# this is what we want to launch 
+# veh is a variable for the name of the bot
 LAUNCH_CMD="roslaunch slam slam_pipeline.launch veh:=ente"
 
 # Print the command we are about to run
 echo "Executing: ${LAUNCH_CMD}"
 
-# Execute the roslaunch command in the background
+# Executes the roslaunch command in the background
 ${LAUNCH_CMD} &
 
-# Capture the process ID (optional)
+# Capture the process ID
 PID=$!
 echo "Launched roslaunch with PID ${PID}"
 
 # Use dt-launchfile-join to keep the container running and manage shutdown
-echo "Joining launch file... (Use Ctrl+C to stop)"
+echo "Joining launch file..."
 dt-launchfile-join
 
-# Optional cleanup after shutdown
+# cleanup after shutdown
 echo "Launch process finished."
-# kill ${PID} # Uncomment if explicit kill is needed and PID capture works
