@@ -2,6 +2,7 @@
 import rospy
 import numpy as np
 import cv2, yaml, os
+import datetime
 
 from std_srvs.srv import Empty, EmptyResponse
 from nav_msgs.msg import OccupancyGrid
@@ -19,8 +20,8 @@ class MapSaverNode:
 
         #parameters
         self.map_topic = rospy.get_param('~map_topic', '/map')
-        self.output_dir = rospy.get_param('~output_dir', 'default_dir')
-        self.map_name   = rospy.get_param('~map_name', 'default_name')
+        self.output_dir = rospy.get_param('~output_dir', default_dir)
+        self.map_name   = rospy.get_param('~map_name', default_name)
 
         #store latest map
         self.latest_map = None
@@ -41,7 +42,6 @@ class MapSaverNode:
 
     def map_callback(self, msg: OccupancyGrid):
         self.latest_map = msg
-        self._dump_to_disk(msg)
 
     def handle_save_map(self, req):
         if self.latest_map is None:
@@ -64,9 +64,13 @@ class MapSaverNode:
         img[arr == 100] =   0
         img[arr == -1] = 205
 
-        #timestamp to avoid overwriting previous data
-        ts = int(rospy.Time.now().to_sec())
-        base = f"{self.map_name}_{ts}"
+        #human‐readable timestamp for filenames
+        now_ts = rospy.Time.now().to_sec()
+        #convert to local datetime
+        dt = datetime.datetime.fromtimestamp(now_ts)
+        #format: DDMMYYYY_HHMM (e.g. 02May2025_0930)
+        timestamp = dt.strftime("%d%b%Y_%H%M")
+        base = f"{self.map_name}_{timestamp}"
         pgm_fp = os.path.join(self.output_dir, base + '.pgm')
         yaml_fp = os.path.join(self.output_dir, base + '.yaml')
 

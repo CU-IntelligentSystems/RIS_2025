@@ -1,9 +1,9 @@
 <launch>
 
   <!-- Vehicle name -->
-  <arg name="veh" default="ente"/>
+  <arg name="veh" default="$(env VEHICLE_NAME)"/>
 
-  <!-- Where to save maps (persistent on the Duckiebot) -->
+  <!-- Where to save maps -->
   <arg name="map_save_dir" default="/data/$(arg veh)/maps"/>
 
   <!-- SLAM mapper parameters -->
