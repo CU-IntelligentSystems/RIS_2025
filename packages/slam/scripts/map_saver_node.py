@@ -9,11 +9,18 @@ from nav_msgs.msg import OccupancyGrid
 class MapSaverNode:
     def __init__(self):
         rospy.init_node('map_saver_node')
+        
+        #read Duckie name from the ENV 
+        vehicle = os.environ.get('VEHICLE_NAME', 'duckie')
+
+        #users can override via ROS params, but default into /data/<veh>/maps
+        default_dir  = f"/data/{vehicle}/maps"
+        default_name = f"{vehicle}_map"
 
         #parameters
         self.map_topic = rospy.get_param('~map_topic', '/map')
-        self.output_dir = rospy.get_param('~output_dir', '/tmp')
-        self.map_name   = rospy.get_param('~map_name', 'duckie_map')
+        self.output_dir = rospy.get_param('~output_dir', 'default_dir')
+        self.map_name   = rospy.get_param('~map_name', 'default_name')
 
         #store latest map
         self.latest_map = None
