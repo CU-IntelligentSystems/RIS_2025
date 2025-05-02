@@ -18,15 +18,7 @@ This project implements and explores Simultaneous Localization and Mapping (SLAM
    into the directory where you cloned it
 
 2.  **Configure Your Duckiebot Name:**
-    Before building, you need to tell the project the hostname of *your* specific Duckiebot. You must replace the default name (`ente`) with your bot's name in the following files:
-
-    * **File:** `packages/White_detection/launch/white_detection.launch`
-        * **Find:** `<arg name="veh" default="ente" ... />`
-        * **Change `ente`** to `YOUR_DUCKIEBOT_NAME`
-
-    * **File:** `packages/localization/launch/duckiebot_localization.launch`
-        * **Find:** `<arg name="veh" default="ente" ... />`
-        * **Change `ente`** to `YOUR_DUCKIEBOT_NAME`
+    Before building, you need to tell the project the hostname of *your* specific Duckiebot. You must replace the default name (`ente`) with your bot's name in the following bash file:
 
     * **File:** `it_begins.sh`
         * **Find:** `LAUNCH_CMD="roslaunch slam slam_pipeline.launch veh:=ente"`
@@ -44,7 +36,7 @@ dts devel build -H YOUR_DUCKIEBOT_NAME -f
 
 Then run the system
 dts devel run -H YOUR_DUCKIEBOT_NAME -L it_begins
-
+``
 ## Viewing
 1) Open a new terminal and type dts start_gui_tools
 2) Then type rosrun rviz rviz 
@@ -54,3 +46,47 @@ dts devel run -H YOUR_DUCKIEBOT_NAME -L it_begins
 
 If you want to view the line detector output 
 - Run rqt_image_view and observe the corresponding topics (line_status_detector/image/line_overlay)
+
+## Saving the map 
+The generated map files are saved directly on the Duckiebot. Follow these steps to access them:
+
+    Verify Connection: Ensure you can reach your Duckiebot on the network. You can test this using ping:
+```bash
+
+ping DuckieName.local
+```
+SSH into Duckiebot: Open a terminal and connect to the Duckiebot using SSH:
+```bash
+
+ssh duckie@DuckieName.local
+```
+(Again, replace YOUR_DUCKIEBOT_NAME with the correct hostname)
+
+Enter Password: When prompted for the password, enter:
+
+quackquack
+
+Navigate to Maps Directory: Once logged in, change to the directory where the maps are stored:
+```bash
+
+cd /data/DuckieName/maps
+```
+## Transfer the map to your local file 
+
+```bash
+mkdir -p ~/duckie_maps
+scp duckie@DuckieName.local:/data/DuckieName/maps/* ~/duckie_maps/
+```
+## Map File Name Formatting
+The generated map files consist of two parts: a .pgm image file and a .yaml metadata file. They follow this naming convention:
+
+Example:
+For a map saved on May 2nd, 2025 at 2:59 PM on a Duckiebot named ente, the files would be:
+
+    ente_map_02May2025_1459.pgm
+    ente_map_02May2025_1459.yaml
+
+
+
+
+
