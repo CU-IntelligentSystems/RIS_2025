@@ -23,7 +23,7 @@ Please ensure that the track that will be used for the duckiebot is smooth to be
 steps:
 1- Build the code: 
 ```bash
-dts devel build 
+dts devel build -f
 ```
 
 2- Run PID control, to make sure that your wheel encoders are reset and aligned:
