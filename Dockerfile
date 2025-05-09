@@ -1,7 +1,7 @@
 # parameters
-ARG REPO_NAME="<REPO_NAME_HERE>"
-ARG DESCRIPTION="<DESCRIPTION_HERE>"
-ARG MAINTAINER="<YOUR_FULL_NAME> (<YOUR_EMAIL_ADDRESS>)"
+ARG REPO_NAME="ris-project"
+ARG DESCRIPTION="This is the Github document for the RIS-Project that requires my group to make the duckiebot stop at the red line while playing with the LEDs"
+ARG MAINTAINER="Durranee Clarke (durraneekclarke@gmail.com)"
 # pick an icon from: https://fontawesome.com/v4.7.0/icons/
 ARG ICON="cube"
 
