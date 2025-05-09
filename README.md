@@ -50,7 +50,8 @@ If you want to view the line detector output
 ## Saving the map 
 The generated map files are saved directly on the Duckiebot. Follow these steps to access them:
 
-    Verify Connection: Ensure you can reach your Duckiebot on the network. You can test this using ping:
+Verify Connection: Ensure you can reach your Duckiebot on the network. You can test this using ping:
+
 ```bash
 
 ping DuckieName.local
