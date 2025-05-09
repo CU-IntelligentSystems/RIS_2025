@@ -1,0 +1,10 @@
+topics:
+  - name: pid
+    topic: /pid/cmd_vel
+    timeout: 0.5
+    priority: 10
+
+  - name: stop
+    topic: /stop/cmd_vel
+    timeout: 0.5
+    priority: 20

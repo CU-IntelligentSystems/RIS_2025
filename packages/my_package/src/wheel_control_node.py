@@ -2,82 +2,46 @@
 
 import os
 import rospy
-import time
-from duckietown.dtros import DTROS, NodeType
-from duckietown_msgs.msg import WheelsCmdStamped
+from duckietown_msgs.msg import LEDPattern
+from std_msgs.msg import ColorRGBA
 
-class WheelControlNode(DTROS):
-    def __init__(self, node_name):
-        super(WheelControlNode, self).__init__(node_name=node_name, node_type=NodeType.GENERIC)
-        
+class LEDColorCycleNode:
+    def __init__(self):
+        rospy.init_node("led_color_cycle_node", anonymous=False)
+
         vehicle_name = os.environ['VEHICLE_NAME']
-        wheels_topic = f"/{vehicle_name}/wheels_driver_node/wheels_cmd"
-        self._publisher = rospy.Publisher(wheels_topic, WheelsCmdStamped, queue_size=1)
-        
-    def set_speed(self, left_speed, right_speed, duration):
-        """Sets wheel speed for a specific duration."""
-        message = WheelsCmdStamped(vel_left=left_speed, vel_right=right_speed)
+        pattern_topic = f"/{vehicle_name}/led_emitter_node/led_pattern"
+        self.led_pattern_pub = rospy.Publisher(pattern_topic, LEDPattern, queue_size=1)
 
-        rate = rospy.Rate(10)  # 10 Hz publishing
+        rospy.sleep(1.0)  # Allow time for publisher to connect
 
-        self._publisher.publish(message)
-        rate.sleep()
+        self.colors = [
+            ColorRGBA(1.0, 0.0, 0.0, 1.0),  # Red
+            ColorRGBA(0.0, 1.0, 0.0, 1.0),  # Green
+            ColorRGBA(0.0, 0.0, 1.0, 1.0),  # Blue
+            ColorRGBA(1.0, 1.0, 1.0, 1.0),  # White
+            ColorRGBA(1.0, 1.0, 0.0, 1.0)   # Yellow
+        ]
 
+        self.run_cycle()
 
-        # start_time2 = time.time()
-        # rate = rospy.Rate(10)  # 10 Hz publishing
-        
-        # while not rospy.is_shutdown() and (time.time() - start_time2) < duration:
-        #     self._publisher.publish(message)
-        #     rate.sleep()
+    def send_led_pattern(self, color):
+        msg = LEDPattern()
+        msg.rgb_vals = [color] * 5  # All LEDs to same color
+        msg.frequency = 0.0         # No blinking
+        msg.frequency_mask = [0] * 5
+        self.led_pattern_pub.publish(msg)
+        rospy.loginfo(f"Sent LED pattern: {color}")
 
-    def run(self):
-        rospy.loginfo("Starting speed sequence...")
-        
+    def run_cycle(self):
+        rate = rospy.Rate(1)  # 1 Hz = 1 color per second
+        while not rospy.is_shutdown():
+            for color in self.colors:
+                self.send_led_pattern(color)
+                rate.sleep()
 
-        # self.set_speed(0.0, 0.0, 1)
-         
-        max_speed = 0.7
-        min_speed = 0.2
-        distance = 5 #m
-
-        #idk it is dviitng by 3
-
-        prev_time = time.time()
-        # rate = rospy.Rate(10)  # 10 Hz publishing
-        
-        a = (max_speed**2 - min_speed**2) / (2 * distance) # acceleration
-
-        print("This is acceleration - ", a)
-
-        speed = min_speed
-
-        # 30% speed for 5 seconds
-        # self.set_speed(speed, speed, 2)
-        print("SPEED", speed)
-
-
-        while not rospy.is_shutdown() and speed < max_speed:
-
-            now = time.time()
-            dt = now - prev_time
-            prev_time = now
-            
-            speed += dt * a
-
-            print(speed, dt)
-            self.set_speed(speed, speed, 0.1)
-            # rate = rospy.Rate(10)  # 10 Hz publishing
-
-        print("SPEED", speed)
-
-        # 30% speed for 5 seconds
-        # self.set_speed(speed, speed, 2)
-        
-        # Stop the robot
-        self.set_speed(0.0, 0.0, 1)
-        rospy.loginfo("Speed sequence completed.")
-
-if __name__ == '__main__':
-    node = WheelControlNode(node_name='wheel_control_node')
-    node.run()
+if __name__ == "__main__":
+    try:
+        LEDColorCycleNode()
+    except rospy.ROSInterruptException:
+        pass
