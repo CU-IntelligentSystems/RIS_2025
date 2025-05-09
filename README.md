@@ -62,9 +62,11 @@ ssh duckie@DuckieName.local
 ```
 (Again, replace YOUR_DUCKIEBOT_NAME with the correct hostname)
 
-Enter Password: When prompted for the password, enter:
+Enter default Password: 
 
+```bash
 quackquack
+```
 
 Navigate to Maps Directory: Once logged in, change to the directory where the maps are stored:
 ```bash
