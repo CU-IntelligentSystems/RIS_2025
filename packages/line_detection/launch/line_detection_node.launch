@@ -1,36 +1,41 @@
 <launch>
-  <!-- AntiInstagram node to compute color thresholds -->
-  <node pkg="image_processing" type="anti_insta_node.py" 
-        name="anti_instagram_node" output="screen">
-    <param name="~device" value="/dev/video0" />
-  </node>
+  <!-- Single-node white-line follower -->
+  
+<node pkg="line_detection"
+      type="line_detection_node.py"
+      name="white_line_detector_follower"
+      ns="paul"
+      output="screen">
+      
+    <!-- Subscribe to the real camera topic under your vehicle namespace -->
+    <remap from="~image/compressed" to="/paul/camera_node/image/compressed"/>
+    <!-- Publish commands where the switch node listens -->
+    <!-- remap from="~custom_car_cmd"         to="/paul/car_cmd_switch_node/cmd"/ -->
+    <!-- remap from="~custom_car_cmd" to="/paul/wheels_driver_node/car_cmd"/ -->
+    <param name="drive_mode" value="auto"/>
+    <!-- White-line HSV thresholds -->
+    <rosparam param="hsv_lower">[0, 0, 200]</rosparam>
+    <rosparam param="hsv_upper">[180, 50, 255]</rosparam>
 
-  <!-- White Line Detector & Follower -->
-  <node pkg="line_detection" type="line_detection_node.py"
-        name="white_line_detector_follower" output="screen">
-    <!-- Image topic remap if needed -->
-    <remap from="~image/compressed" to="/camera/image/compressed"/>
-    <remap from="~thresholds"    to="/anti_instagram_node/thresholds"/>
+    <!-- Region-of-interest cropping -->
+    <param  name="roi_fraction" value="0.5"/>
+    <param  name="top_cutoff"   value="0"/>
 
-    <!-- Tunable parameters -->
-    <param name="~hsv_lower"    value="[0,0,200]" />
-    <param name="~hsv_upper"    value="[180,50,255]" />
-    <param name="~roi_fraction" value="0.5" />
-    <param name="~top_cutoff"   value="0" />
+    <!-- Hough-line detection settings -->
+    <param name="hough_rho"       value="1"/>
+    <param name="hough_theta"     value="0.0174533"/>
+    <param name="hough_threshold" value="50"/>
+    <param name="hough_min_line"  value="50"/>
+    <param name="hough_max_gap"   value="20"/>
 
-    <!-- Hough settings -->
-    <param name="~hough_threshold" value="50" />
-    <param name="~hough_min_line"  value="50" />
-    <param name="~hough_max_gap"   value="20" />
+    <!-- Control gains & speeds -->
+    <param name="Kp_pos"     value="0.005"/>
+    <param name="Kp_ang"     value="1.0"/>
+    <param name="v_straight" value="3.0"/>
+    <param name="v_turn"     value="1.0"/>
+    <param name="err_thresh" value="20.0"/>
 
-    <!-- Control gains -->
-    <param name="~Kp_pos"   value="0.005" />
-    <param name="~Kp_ang"   value="1.0" />
-    <param name="~v_straight" value="0.2" />
-    <param name="~v_turn"     value="0.1" />
-    <param name="~err_thresh" value="20.0" />
-
-    <!-- Debug -->
-    <param name="~debug" value="true" />
+    <!-- Enable debug -->
+    <param name="debug" value="true"/>
   </node>
 </launch>

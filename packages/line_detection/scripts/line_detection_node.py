@@ -11,7 +11,6 @@ from sensor_msgs.msg import CompressedImage, Image
 from std_msgs.msg import Float32
 from duckietown_msgs.msg import Twist2DStamped
 from duckietown.dtros import DTROS, NodeType, TopicType
-from image_processing.anti_instagram import AntiInstagram
 
 class WhiteLineDetectorFollowerNode(DTROS):
     def __init__(self, node_name):
@@ -19,12 +18,10 @@ class WhiteLineDetectorFollowerNode(DTROS):
             node_name=node_name,
             node_type=NodeType.CONTROL
         )
-        # --- Initialization ---
+        # Initialization
         self.bridge = CvBridge()
-        self.ai = AntiInstagram()
-        self.ai_ready = False
 
-        # --- Parameters ---
+        # Parameters
         hsv_lo = rospy.get_param('~hsv_lower', [0, 0, 200])
         hsv_hi = rospy.get_param('~hsv_upper', [180, 50, 255])
         self.hsv_lower = np.array(hsv_lo, dtype=np.uint8)
@@ -48,39 +45,30 @@ class WhiteLineDetectorFollowerNode(DTROS):
 
         self.debug = rospy.get_param('~debug', False)
 
-        # --- Publishers ---
+        # Publishers
         self.pub_error = rospy.Publisher('~line_error', Float32, queue_size=1, dt_topic_type=TopicType.DEBUG)
         self.pub_angle = rospy.Publisher('~line_angle', Float32, queue_size=1, dt_topic_type=TopicType.DEBUG)
-        self.pub_cmd = rospy.Publisher('~car_cmd', Twist2DStamped, queue_size=1, dt_topic_type=TopicType.CONTROL)
+        self.pub_cmd = rospy.Publisher('~custom_car_cmd', Twist2DStamped, queue_size=1, dt_topic_type=TopicType.CONTROL)
         if self.debug:
             self.pub_mask = rospy.Publisher('~debug/mask', Image, queue_size=1, dt_topic_type=TopicType.DEBUG)
             self.pub_hough = rospy.Publisher('~debug/hough', Image, queue_size=1, dt_topic_type=TopicType.DEBUG)
 
-        # --- Subscribers ---
+        # Subscriber
         self.sub_image = rospy.Subscriber('~image/compressed', CompressedImage,
                                           self.image_cb, buff_size=2**24, queue_size=1)
-        self.sub_thresh = rospy.Subscriber('~thresholds', AntiInstagramThresholds,
-                                           self.thresholds_cb, queue_size=1)
 
         rospy.loginfo('WhiteLineDetectorFollowerNode initialized')
 
-    def thresholds_cb(self, msg):
-        # Receive AntiInstagram color balance thresholds
-        self.ai.set_color_balance(msg.low, msg.high)
-        self.ai_ready = True
-
     def image_cb(self, msg):
-        # --- 1. Decode image ---
-        np_arr = np.fromstring(msg.data, np.uint8)
+        # 1. Decode image
+        np_arr = np.frombuffer(msg.data, dtype=np.uint8)
         frame = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
         if frame is None:
             return
+        if self.debug:
+            rospy.loginfo('🖼️ image_cb() received frame')
 
-        # --- 2. Color correction ---
-        if self.ai_ready:
-            frame = self.ai.apply_color_balance(frame)
-
-        # --- 3. Resize & crop ROI ---
+        # 2. Resize & crop ROI
         h, w = frame.shape[:2]
         new_w = rospy.get_param('~img_width', w)
         new_h = rospy.get_param('~img_height', h)
@@ -88,12 +76,12 @@ class WhiteLineDetectorFollowerNode(DTROS):
         y0 = int((1.0 - self.roi_frac) * new_h) + self.top_cutoff
         roi = frame[y0:new_h, :]
 
-        # --- 4. White segmentation ---
+        # 3. White segmentation
         hsv = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
         mask = cv2.inRange(hsv, self.hsv_lower, self.hsv_upper)
-        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, np.ones((3,3),np.uint8))
+        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, np.ones((3,3), np.uint8))
 
-        # --- 5. Centroid error ---
+        # 4. Centroid error
         M = cv2.moments(mask)
         err = 0.0
         if M['m00'] > 0:
@@ -101,7 +89,7 @@ class WhiteLineDetectorFollowerNode(DTROS):
             err = cx - (new_w / 2.0)
         self.pub_error.publish(err)
 
-        # --- 6. Hough line detection for orientation ---
+        # 5. Hough line detection for orientation
         angle = 0.0
         lines = cv2.HoughLinesP(mask,
                                 self.hough_rho,
@@ -110,30 +98,46 @@ class WhiteLineDetectorFollowerNode(DTROS):
                                 minLineLength=self.hough_min_line,
                                 maxLineGap=self.hough_max_gap)
         if lines is not None:
-            angles = [np.arctan2((y1 - y2), (x2 - x1)) for x1,y1,x2,y2 in lines[:,0]]
+            angles = [np.arctan2((y1 - y2), (x2 - x1)) for x1, y1, x2, y2 in lines[:,0]]
             angle = float(np.mean(angles))
         self.pub_angle.publish(angle)
 
-        # --- 7. Control law (combine position & heading) ---
+        # 6. Control law (combine position & heading)
         omega = - (self.Kp_pos * err + self.Kp_ang * angle)
         v = self.v_straight if abs(err) < self.err_thresh else self.v_turn
+
+        # Debug: log control values
+        if self.debug:
+            rospy.loginfo('err=%.1f px, angle=%.2f rad, v=%.2f, ω=%.2f', err, angle, v, omega)
+
         cmd = Twist2DStamped()
         cmd.header.stamp = rospy.Time.now()
         cmd.v = v
         cmd.omega = omega
         self.pub_cmd.publish(cmd)
 
-        # --- 8. Debug visuals ---
+        # 7. Debug visuals
         if self.debug:
-            # mask view
             mask_img = self.bridge.cv2_to_imgmsg(mask, encoding='mono8')
             mask_img.header = msg.header
             self.pub_mask.publish(mask_img)
-            # hough overlay
+
             vis = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
             if lines is not None:
-                for x1,y1,x2,y2 in lines[:,0]:
-                    cv2.line(vis,(int(x1),int(y1)),(int(x2),int(y2)),(0,255,0),2)
+                for x1, y1, x2, y2 in lines[:,0]:
+                    cv2.line(vis, (int(x1),int(y1)), (int(x2),int(y2)), (0,255,0), 2)
+            hough_msg = self.bridge.cv2_to_imgmsg(vis, encoding='bgr8')
+            hough_msg.header = msg.header
+            self.pub_hough.publish(hough_msg)
+        if self.debug:
+            mask_img = self.bridge.cv2_to_imgmsg(mask, encoding='mono8')
+            mask_img.header = msg.header
+            self.pub_mask.publish(mask_img)
+
+            vis = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
+            if lines is not None:
+                for x1, y1, x2, y2 in lines[:,0]:
+                    cv2.line(vis, (int(x1),int(y1)), (int(x2),int(y2)), (0,255,0), 2)
             hough_msg = self.bridge.cv2_to_imgmsg(vis, encoding='bgr8')
             hough_msg.header = msg.header
             self.pub_hough.publish(hough_msg)
@@ -144,4 +148,4 @@ class WhiteLineDetectorFollowerNode(DTROS):
 if __name__ == '__main__':
     node = WhiteLineDetectorFollowerNode(node_name='white_line_detector_follower')
     node.run()
-      
+

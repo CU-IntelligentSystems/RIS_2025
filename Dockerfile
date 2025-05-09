@@ -1,5 +1,5 @@
 # parameters
-ARG REPO_NAME="lili"
+ARG REPO_NAME="lili-2"
 ARG DESCRIPTION="risproject"
 ARG MAINTAINER="ZiyuGu (zgu@constructor.university)"
 # pick an icon from: https://fontawesome.com/v4.7.0/icons/
