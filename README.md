@@ -68,19 +68,27 @@ Enter default Password:
 quackquack
 ```
 
-Navigate to Maps Directory: Once logged in, change to the directory where the maps are stored:
+Navigate to Maps Directory: Once logged in, change to the directory to see where the maps are stored:
 ```bash
 
 cd /data/DuckieName/maps
+ls
 ```
 ## Transfer the map to your local file 
 
+Exit the ssh connection:
+```bash
+exit
+```
+
+Create a directory on your machine and transfer them form the Duckie to that directory:
 ```bash
 mkdir -p ~/duckie_maps
 scp duckie@DuckieName.local:/data/DuckieName/maps/* ~/duckie_maps/
 ```
 ## Map File Name Formatting
-The generated map files consist of two parts: a .pgm image file and a .yaml metadata file. They follow this naming convention:
+The generated map files consist of two parts: a .pgm image file and a .yaml metadata file. 
+They follow the naming convention DuckieName_map_DDMMYYYY_HHMM.
 
 Example:
 For a map saved on May 2nd, 2025 at 2:59 PM on a Duckiebot named ente, the files would be:
