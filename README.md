@@ -6,7 +6,14 @@ We also added a PID controller to be able to reduce the deviation from the path 
 ## Installation:
 steps:
 1-clone demo branch of the repository 'Croissant' to your local machine
+```bash 
+git clone --branch demo --single-branch https://github.com/Gulin534/Croissant.git
+```
+
 2-navigate to the cloned directory
+```bash
+cd Croissant
+```
 
 ## How to set up a proper environment to be able to run the code with no problems
 !!!make sure there is nothing RED around!!! (because having any red objects in the vicinity of the robot will intrefere with being able to test the code as the main purpose is for it to stop if a red object is detected.)
