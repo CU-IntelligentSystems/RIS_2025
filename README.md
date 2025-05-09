@@ -1,47 +1,30 @@
-# Template: template-ros
+## Explanation of our code:
+The idea is that when an object that is red (which is associated with stop in traffic) is detected within a distance of   0.15 meters, the duckiebot should start a stop sequence and will have stopped before reaching the object (to simulate the idea of realising the need to stop and having the space for braking which is crucial in traffic) 
 
-This template provides a boilerplate repository
-for developing ROS-based software in Duckietown.
+We also added a PID controller to be able to reduce the deviation from the path that our duckiebot was experiencing
 
-**NOTE:** If you want to develop software that does not use
-ROS, check out [this template](https://github.com/duckietown/template-basic).
+## Installation:
+steps:
+1-clone demo branch of the repository 'Croissant' to your local machine
+2-navigate to the cloned directory
 
+## How to set up a proper environment to be able to run the code with no problems
+!!!make sure there is nothing RED around!!! (because having any red objects in the vicinity of the robot will intrefere with being able to test the code as the main purpose is for it to stop if a red object is detected.)
+Please ensure that the track that will be used for the duckiebot is smooth to be able to observe the PID working.
 
-## How to use it
+## How to use it:
+steps:
+1- Build the code: 
+```bash
+dts devel build 
+```
 
-### 1. Fork this repository
+2- Run PID control, to make sure that your wheel encoders are reset and aligned:
+```bash
+dts devel run -R (name_of_robot) -L encoder-pid -X
 
-Use the fork button in the top-right corner of the github page to fork this template repository.
-
-
-### 2. Create a new repository
-
-Create a new repository on github.com while
-specifying the newly forked template repository as
-a template for your new repository.
-
-
-### 3. Define dependencies
-
-List the dependencies in the files `dependencies-apt.txt` and
-`dependencies-py3.txt` (apt packages and pip packages respectively).
-
-
-### 4. Place your code
-
-Place your code in the directory `/packages/` of
-your new repository.
-
-
-### 5. Setup launchers
-
-The directory `/launchers` can contain as many launchers (launching scripts)
-as you want. A default launcher called `default.sh` must always be present.
-
-If you create an executable script (i.e., a file with a valid shebang statement)
-a launcher will be created for it. For example, the script file 
-`/launchers/my-launcher.sh` will be available inside the Docker image as the binary
-`dt-launcher-my-launcher`.
-
-When launching a new container, you can simply provide `dt-launcher-my-launcher` as
-command.
+```
+3- Run the twist_mux_launcher which will run the 4 nodes needed for the code to work:
+```bash
+ dts devel run -R (name_of_robot) -L twist_mux_launcher -X
+ ```
