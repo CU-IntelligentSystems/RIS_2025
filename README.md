@@ -28,7 +28,7 @@ dts devel build -f
 
 2- Run PID control, to make sure that your wheel encoders are reset and aligned:
 ```bash
-dts devel run -R (name_of_robot) -L encoder-pid -X
+dts devel run -R (name_of_robot) -L encoder-pid 
 
 ```
 3- Run the twist_mux_launcher which will run the 4 nodes needed for the code to work:
