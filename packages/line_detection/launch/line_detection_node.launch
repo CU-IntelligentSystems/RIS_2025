@@ -10,12 +10,12 @@
     <!-- Subscribe to the real camera topic under your vehicle namespace -->
     <remap from="~image/compressed" to="/paul/camera_node/image/compressed"/>
     <!-- Publish commands where the switch node listens -->
-    <!-- remap from="~custom_car_cmd"         to="/paul/car_cmd_switch_node/cmd"/ -->
-    <!-- remap from="~custom_car_cmd" to="/paul/wheels_driver_node/car_cmd"/ -->
+    
+
     <param name="drive_mode" value="auto"/>
     <!-- White-line HSV thresholds -->
-    <rosparam param="hsv_lower">[0, 0, 200]</rosparam>
-    <rosparam param="hsv_upper">[180, 50, 255]</rosparam>
+    <rosparam param="hsv_lower">[0, 0, 230]</rosparam>
+    <rosparam param="hsv_upper">[180, 30, 255]</rosparam>
 
     <!-- Region-of-interest cropping -->
     <param  name="roi_fraction" value="0.5"/>
@@ -30,9 +30,9 @@
 
     <!-- Control gains & speeds -->
     <param name="Kp_pos"     value="0.005"/>
-    <param name="Kp_ang"     value="1.0"/>
-    <param name="v_straight" value="3.0"/>
-    <param name="v_turn"     value="1.0"/>
+    <param name="Kp_ang"     value="1"/>
+    <param name="v_straight" value="0.5"/>
+    <param name="v_turn"     value="0.5"/>
     <param name="err_thresh" value="20.0"/>
 
     <!-- Enable debug -->

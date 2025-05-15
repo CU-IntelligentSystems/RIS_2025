@@ -22,7 +22,7 @@ class WhiteLineDetectorFollowerNode(DTROS):
         self.bridge = CvBridge()
 
         # Parameters
-        hsv_lo = rospy.get_param('~hsv_lower', [0, 0, 200])
+        hsv_lo = rospy.get_param('~hsv_lower', [0, 0, 230])
         hsv_hi = rospy.get_param('~hsv_upper', [180, 50, 255])
         self.hsv_lower = np.array(hsv_lo, dtype=np.uint8)
         self.hsv_upper = np.array(hsv_hi, dtype=np.uint8)
@@ -31,10 +31,10 @@ class WhiteLineDetectorFollowerNode(DTROS):
 
         # Hough parameters
         self.hough_rho = rospy.get_param('~hough_rho', 1)
-        self.hough_theta = rospy.get_param('~hough_theta', np.pi/180)
-        self.hough_threshold = rospy.get_param('~hough_threshold', 50)
-        self.hough_min_line = rospy.get_param('~hough_min_line', 50)
-        self.hough_max_gap = rospy.get_param('~hough_max_gap', 20)
+        self.hough_theta = rospy.get_param('~hough_theta', np.pi/360)
+        self.hough_threshold = rospy.get_param('~hough_threshold', 80)
+        self.hough_min_line = rospy.get_param('~hough_min_line', 60)
+        self.hough_max_gap = rospy.get_param('~hough_max_gap', 10)
 
         # Control gains
         self.Kp_pos = rospy.get_param('~Kp_pos', 0.005)
@@ -48,7 +48,9 @@ class WhiteLineDetectorFollowerNode(DTROS):
         # Publishers
         self.pub_error = rospy.Publisher('~line_error', Float32, queue_size=1, dt_topic_type=TopicType.DEBUG)
         self.pub_angle = rospy.Publisher('~line_angle', Float32, queue_size=1, dt_topic_type=TopicType.DEBUG)
-        self.pub_cmd = rospy.Publisher('~custom_car_cmd', Twist2DStamped, queue_size=1, dt_topic_type=TopicType.CONTROL)
+        self.pub_cmd = rospy.Publisher('car_cmd_switch_node/cmd', Twist2DStamped, queue_size=1, dt_topic_type=TopicType.CONTROL)
+        
+        rospy.on_shutdown(self.on_shutdown)
         if self.debug:
             self.pub_mask = rospy.Publisher('~debug/mask', Image, queue_size=1, dt_topic_type=TopicType.DEBUG)
             self.pub_hough = rospy.Publisher('~debug/hough', Image, queue_size=1, dt_topic_type=TopicType.DEBUG)
@@ -115,6 +117,8 @@ class WhiteLineDetectorFollowerNode(DTROS):
         cmd.v = v
         cmd.omega = omega
         self.pub_cmd.publish(cmd)
+        
+
 
         # 7. Debug visuals
         if self.debug:
@@ -141,9 +145,19 @@ class WhiteLineDetectorFollowerNode(DTROS):
             hough_msg = self.bridge.cv2_to_imgmsg(vis, encoding='bgr8')
             hough_msg.header = msg.header
             self.pub_hough.publish(hough_msg)
-
+            
+	
+    def on_shutdown(self):
+        rospy.loginfo("Shutting down, sending stop command...")
+        stop_cmd = Twist2DStamped()
+        stop_cmd.v = 0.0
+        stop_cmd.omega = 0.0
+        stop_cmd.header.stamp = rospy.Time.now()
+        self.pub_cmd.publish(stop_cmd)
+ 
     def run(self):
         rospy.spin()
+        
 
 if __name__ == '__main__':
     node = WhiteLineDetectorFollowerNode(node_name='white_line_detector_follower')

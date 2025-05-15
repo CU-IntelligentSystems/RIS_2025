@@ -14,11 +14,8 @@ source environment.sh
 
 # 3. Run the ROS launch file
 roslaunch line_detection line_detection_node.launch
-roslaunch line_detection bridge_twist_to_wheels.launch
 roslaunch camera_reader camera_reader.launch &
 roslaunch wheel_control wheel_control.launch &
-roslaunch wheel_encoder_reader wheel_encoder_reader.launch &
 roslaunch twist_control twist_control.launch &
-roslaunch wheel_encoder_reader wheel_encoder_reader.launch &
 
 
