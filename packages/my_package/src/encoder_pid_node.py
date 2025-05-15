@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-
+'''
 import os
 import rospy
 import time
+import matplotlib.pyplot as plt
 from duckietown.dtros import DTROS, NodeType
 from duckietown_msgs.msg import WheelsCmdStamped, WheelEncoderStamped
+
 
 class EncoderPIDNode(DTROS):
     def __init__(self, node_name):
@@ -24,7 +26,7 @@ class EncoderPIDNode(DTROS):
 
         # PID gains
         self.Kp = 0.005
-        self.Ki = 0.0001
+        self.Ki = 0.0001    # 0.0001  
         self.Kd = 0.001
 
         self.integral = 0
@@ -35,6 +37,11 @@ class EncoderPIDNode(DTROS):
         self.sub_right = rospy.Subscriber(self._right_encoder_topic, WheelEncoderStamped, self.callback_right)
 
         self.reset_encoders = False
+
+        # self.time_log = []
+        # self.left_cmd_log = []
+        # self.right_cmd_log = []
+
 
     def callback_left(self, data):
         if self.reset_encoders:
@@ -87,6 +94,12 @@ class EncoderPIDNode(DTROS):
                 rospy.loginfo(f"[CMD] L: {left_cmd:.3f}, R: {right_cmd:.3f} | Error: {error} | Correction: {correction:.4f}")
 
                 self.last_error = error
+
+                # current_time = time.time() - start_time
+                # self.time_log.append(current_time)
+                # self.left_cmd_log.append(left_cmd)
+                # self.right_cmd_log.append(right_cmd)
+
             else:
                 rospy.loginfo("Waiting for encoder data...")
 
@@ -94,6 +107,20 @@ class EncoderPIDNode(DTROS):
 
         self._publisher.publish(WheelsCmdStamped(vel_left=0.0, vel_right=0.0))
         rospy.loginfo("PID controller stopped after 5 seconds.")
+
+        # # Plot motor commands over time
+        # plt.figure()
+        # plt.plot(self.time_log, self.left_cmd_log, label="Left Motor")
+        # plt.plot(self.time_log, self.right_cmd_log, label="Right Motor")
+        # plt.xlabel("Time (s)")
+        # plt.ylabel("Motor Command")
+        # plt.title("Motor Speed Commands Over Time")
+        # plt.legend()
+        # plt.grid(True)
+        # plt.show()
+        # rospy.loginfo("PID controller stopped after 5 seconds.")
+
+
 
 if __name__ == '__main__':
     node = EncoderPIDNode(node_name='encoder_pid_node')
@@ -108,16 +135,13 @@ if __name__ == '__main__':
 
 
 
-
-
-
-
-
-
-
-
 '''
-#!/usr/bin/env python3
+
+
+
+
+
+
 
 import os
 import rospy
@@ -214,7 +238,7 @@ if __name__ == '__main__':
     node = EncoderPIDNode(node_name='encoder_pid_node')
     node.run()
 
-'''
+
 
 
 
