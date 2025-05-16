@@ -108,7 +108,6 @@ scipy>=1.7.0
 - The camera calibration matrix and distortion coefficients need to be replaced with your own robot's calibration values. 
 - add the name of your robot to the topics
 - We used the default tag size: `0.065 m` (6.5 cm). 
-
-
+- Make the python scripts executable `chmod +x`
 ---
 
