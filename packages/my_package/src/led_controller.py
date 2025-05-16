@@ -34,9 +34,9 @@ class LEDController:
             rospy.loginfo(f"Received LED command: {msg.data}")
             pattern = LEDPattern()  # message specifying LED colors
             if msg.data == "red":  # Checking if the received message contains the string "red"
-                pattern.rgb_vals = [255, 0, 0] * 5  # All red (adjust to * 4 if 4 LEDs)
+                pattern.rgb_vals = [255, 0, 0] * 4  # All red (adjusted to * 4 because the duckiebot has 4 LEDs)
             elif msg.data == "green":
-                pattern.rgb_vals = [0, 255, 0] * 5  # All green (adjust to * 4 if 4 LEDs)
+                pattern.rgb_vals = [0, 255, 0] * 4  # All green (adjust to * 4 because the duckiebot has 4 LEDs)
             else:
                 rospy.logwarn(f"Unknown color command: {msg.data}")
                 return
@@ -50,10 +50,10 @@ class LEDController:
         try:
             pattern = LEDPattern()
             if self.debug_color == "red":
-                pattern.rgb_vals = [255, 0, 0] * 5  # Red
+                pattern.rgb_vals = [255, 0, 0] * 4  # Red
                 self.debug_color = "green"
             else:
-                pattern.rgb_vals = [0, 255, 0] * 5  # Green
+                pattern.rgb_vals = [0, 255, 0] * 4 # Green
                 self.debug_color = "red"
             self.led_pub.publish(pattern)
             rospy.loginfo(f"Debug: Published test LED pattern ({self.debug_color}): {pattern.rgb_vals}")
