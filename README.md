@@ -42,7 +42,7 @@ source /opt/ros/melodic/setup.bash
 source /code/catkin_ws/devel/setup.bash
 
 # Run project
-dts devel build dts devel build -H your_bot_name -f
+dts devel build -H your_bot_name -f
 
 dts devel run -H your_bot_name -L run_white_line_follower
 
