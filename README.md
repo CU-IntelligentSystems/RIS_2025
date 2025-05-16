@@ -37,12 +37,23 @@ dts devel build -H YOUR_DUCKIEBOT_NAME -f
 Then run the system
 dts devel run -H YOUR_DUCKIEBOT_NAME -L it_begins
 ```
+## Keyboard Control 
+To control the bot, we suggest using the keyboard control. To do this, type: 
+```bash
+dts duckiebot keyboard_control YOUR_DUCKIEBOT_NAME
+```
 ## Viewing
-1) Open a new terminal and type dts start_gui_tools
-2) Then type rosrun rviz rviz 
-3) Switch to odom frame
-4) Add TF data and open \map topic
-5) Et voila! You can start to play around with your bot 
+1) Open a new terminal and type
+```bash
+dts start_gui_tools
+```
+3) Then type 
+```bash
+rosrun rviz rviz
+```
+4) Switch to odom frame
+5) Add TF data and open \map topic
+6) Et voila! You can start to play around with your bot 
 
 If you want to view the line detector output 
 - Run rqt_image_view and observe the corresponding topics (line_status_detector/image/line_overlay)
