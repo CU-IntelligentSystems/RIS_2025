@@ -23,7 +23,7 @@ Once you are in the ris-project directory, build the project using:
 dts devel build -f
 ```
 
-The -f flag (--force) allows the build to proceed even if the repository is not “clean,” i.e., after making local edits.
+The `-f` flag (`--force`) allows the build to proceed even if the repository is not “clean,” i.e., after making local edits.
 **Note:** This process may take some time.
 
 
