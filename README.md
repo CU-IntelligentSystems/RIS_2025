@@ -55,7 +55,9 @@ Replace ROBOT_NAME with the name of the robot you are using (e.g. paul).
 
 ### Additional Notes
 Ensure your DuckieBot is properly connected to your network and is visible when using the command:
+```bash
 dts fleet discover
+```
 on before launching.
 If you encounter any issues during the build or execution process, refer to the [Duckietown Troubleshooting Guide](https://docs.duckietown.com/daffy/opmanual-duckiebot/intro.html) .
 Contributions and feedback are welcome! 
