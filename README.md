@@ -1,47 +1,55 @@
-# Template: template-ros
+# DuckieBot Red Line Detection Project
 
-This template provides a boilerplate repository
-for developing ROS-based software in Duckietown.
+You are about to begin the process of retrieving the necessary information to program the DuckieBot to stop at a red line for 4 seconds and then proceed by moving forward. This README will guide you through setting up, building, and running the project on your system.
 
-**NOTE:** If you want to develop software that does not use
-ROS, check out [this template](https://github.com/duckietown/template-basic).
-
-
-## How to use it
-
-### 1. Fork this repository
-
-Use the fork button in the top-right corner of the github page to fork this template repository.
+**Prerequisites:** Ensure you have git installed on your system.
+Install the Duckietown Shell (dts) and Docker if they are not already installed. Refer to the [Duckietown Documentation](https://docs.duckietown.com/daffy/) for setup instructions. 
 
 
-### 2. Create a new repository
+## Instructions:
 
-Create a new repository on github.com while
-specifying the newly forked template repository as
-a template for your new repository.
+### Step 1. Clone the Repository
 
-
-### 3. Define dependencies
-
-List the dependencies in the files `dependencies-apt.txt` and
-`dependencies-py3.txt` (apt packages and pip packages respectively).
+Open your terminal and clone the GitHub repository using the following commands:
+git clone https://github.com/Durranee-c/ris-project 
+cd ris-project
 
 
-### 4. Place your code
+### Step 2. Build the Project
 
-Place your code in the directory `/packages/` of
-your new repository.
+Once you are in the ris-project directory, build the project using:
+dts devel build -f
+
+The -f flag (--force) allows the build to proceed even if the repository is not “clean,” i.e., after making local edits.
+**Note:** This process may take some time.
 
 
-### 5. Setup launchers
+### Step 3: Make Python Files Executable
 
-The directory `/launchers` can contain as many launchers (launching scripts)
-as you want. A default launcher called `default.sh` must always be present.
+Convert all the Python files into executables using the following commands:
+chmod +x ./packages/my_package/src/red_line_detector.py
+chmod +x ./packages/my_package/src/camera_reader_node.py
+chmod +x ./packages/my_package/src/led_controller.py
+chmod +x ./packages/my_package/src/wheel_controller.py
 
-If you create an executable script (i.e., a file with a valid shebang statement)
-a launcher will be created for it. For example, the script file 
-`/launchers/my-launcher.sh` will be available inside the Docker image as the binary
-`dt-launcher-my-launcher`.
+### Step 4: Rebuild the Project
 
-When launching a new container, you can simply provide `dt-launcher-my-launcher` as
-command.
+After making the Python files executable, rebuild the project:
+dts devel build -f
+
+
+### Step 5: Launch the DuckieBot
+
+Finally, launch the launcher file using the following command:
+dts devel run -R ROBOT_NAME -L duckiebot_launcher
+
+Replace ROBOT_NAME with the name of the robot you are using (e.g. paul).
+
+### Additional Notes
+Ensure your DuckieBot is properly connected to your network and is visible when using the command:
+dts fleet discover
+on before launching.
+If you encounter any issues during the build or execution process, refer to the [Duckietown Troubleshooting Guide](https://docs.duckietown.com/daffy/opmanual-duckiebot/debugging_and_troubleshooting) .
+Contributions and feedback are welcome! 
+
+By following these steps, you should be able to successfully program your DuckieBot to detect the red line, stop for 4 seconds, and resume movement. Enjoy experimenting with your robot!
