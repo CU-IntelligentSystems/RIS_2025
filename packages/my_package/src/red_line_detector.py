@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-
+#This module processes images from the Duckiebot’s camera to detect a red line. 
+#It subscribes to the compressed camera image topic, converts images to the HSV color space, and applies a mask to identify red pixels. 
+#If a significant red area is detected (based on a tunable threshold), it publishes a boolean message to indicate the presence of a red line. 
+#The module ensures efficient processing by only publishing new detections to avoid redundant messages.
 import rospy
 import os
 import cv2  # importing OpenCV for image processing - detecting the red line.
@@ -39,7 +42,7 @@ class RedLineDetector:
             upper_red = np.array([10, 255, 255])  # Defining the upper bound for red in HSV
             mask = cv2.inRange(hsv, lower_red, upper_red)  # creating a binary mask where pixels within the red range are white (255), and others are black (0).
             # Check for significant red area
-            if np.sum(mask) > 500000:  # Threshold may need tuning
+            if np.sum(mask) > 500000:  # Threshold 
                 if not self.red_line_detected:  # avoiding spamming or multiple publishing
                     rospy.loginfo("Red line detected!")
                     self.red_line_pub.publish(Bool(data=True))
