@@ -2,8 +2,8 @@
 
 You are about to begin the process of retrieving the necessary information to program the DuckieBot to stop at a red line for 4 seconds and then proceed by moving forward. This README will guide you through setting up, building, and running the project on your system.
 
-**Prerequisites:** Ensure you have git installed on your system.
-Install the Duckietown Shell (dts) and Docker if they are not already installed. Refer to the [Duckietown Documentation](https://docs.duckietown.com/daffy/) for setup instructions. 
+**Prerequisites:** Ensure you have `git` installed on your system.
+Install the Duckietown Shell (`dts`) and Docker if they are not already installed. Refer to the [Duckietown Documentation](https://docs.duckietown.com/daffy/) for setup instructions. 
 
 
 ## Instructions:
