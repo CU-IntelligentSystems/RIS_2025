@@ -19,7 +19,9 @@ cd ris-project
 ### Step 2. Build the Project
 
 Once you are in the ris-project directory, build the project using:
+```bash
 dts devel build -f
+```
 
 The -f flag (--force) allows the build to proceed even if the repository is not “clean,” i.e., after making local edits.
 **Note:** This process may take some time.
@@ -28,21 +30,26 @@ The -f flag (--force) allows the build to proceed even if the repository is not 
 ### Step 3: Make Python Files Executable
 
 Convert all the Python files into executables using the following commands:
+```bash
 chmod +x ./packages/my_package/src/red_line_detector.py
 chmod +x ./packages/my_package/src/camera_reader_node.py
 chmod +x ./packages/my_package/src/led_controller.py
 chmod +x ./packages/my_package/src/wheel_controller.py
+```
 
 ### Step 4: Rebuild the Project
 
 After making the Python files executable, rebuild the project:
+``` bash
 dts devel build -f
-
+```
 
 ### Step 5: Launch the DuckieBot
 
 Finally, launch the launcher file using the following command:
+```bash
 dts devel run -R ROBOT_NAME -L duckiebot_launcher
+```
 
 Replace ROBOT_NAME with the name of the robot you are using (e.g. paul).
 
