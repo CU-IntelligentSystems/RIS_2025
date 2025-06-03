@@ -57,7 +57,7 @@ Replace ROBOT_NAME with the name of the robot you are using (e.g. paul).
 Ensure your DuckieBot is properly connected to your network and is visible when using the command:
 dts fleet discover
 on before launching.
-If you encounter any issues during the build or execution process, refer to the [Duckietown Troubleshooting Guide](https://docs.duckietown.com/daffy/opmanual-duckiebot/debugging_and_troubleshooting) .
+If you encounter any issues during the build or execution process, refer to the [Duckietown Troubleshooting Guide](https://docs.duckietown.com/daffy/opmanual-duckiebot/intro.html) .
 Contributions and feedback are welcome! 
 
 By following these steps, you should be able to successfully program your DuckieBot to detect the red line, stop for 4 seconds, and resume movement. Enjoy experimenting with your robot!
