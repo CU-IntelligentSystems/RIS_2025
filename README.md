@@ -11,9 +11,10 @@ Install the Duckietown Shell (dts) and Docker if they are not already installed.
 ### Step 1. Clone the Repository
 
 Open your terminal and clone the GitHub repository using the following commands:
+```bash
 git clone https://github.com/Durranee-c/ris-project 
 cd ris-project
-
+```
 
 ### Step 2. Build the Project
 
