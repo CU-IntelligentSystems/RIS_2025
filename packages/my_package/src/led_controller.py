@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-
+#This module manages the Duckiebot’s LED lights by responding to color commands or running a debug routine. 
+#It subscribes to a topic that receives string messages (e.g., "red" or "green") and publishes corresponding LED patterns to control the Duckiebot’s four LEDs.
+#In debug mode, it toggles the LEDs between red and green every five seconds to test functionality, ensuring reliable operation through error handling and logging.
 import rospy
 import os
 from duckietown_msgs.msg import LEDPattern
@@ -22,7 +24,7 @@ class LEDController:
             f"/{self._vehicle_name}/leds", 
             String, 
             self.color_callback,
-            queue_size=10  # Increased to prevent message loss
+            queue_size=10  # Increased to 10 to prevent message loss
             # creating a subscriber to listen for string messages like "red" or "green".
         )
         # Debug mode: Toggle colors every 5 seconds
