@@ -81,7 +81,6 @@ The project demonstrates the core principles of autonomous navigation and provid
 1. Launch the DuckieBot simulation environment in Gazebo
 2. Start the lane following node:
 
-   ```bash
    ros2 run duckiebot_lane_following simple_lane_follower.py
    ```
 3. Monitor the robot navigating the track in real-time
