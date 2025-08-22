@@ -1,9 +1,30 @@
-Duckietown Gazebo — Quick Start & Ops Cheatsheet
+Duckietown Gazebo — Quick Start 
 ================================================
+https://drive.google.com/file/d/1Ac-K2349BRdY-3yQVffOAFaB_4hKZ-es/view?usp=sharing
 
-Container attach
-----------------
-# From HOST (not inside container)
+download duckietowne_gazebo.tar.gz from here
+
+load the image using 
+
+docker load -i duckietowne_gazebo.tar.gx
+----------------------------
+Verify image with the command 
+
+docker images
+
+then use
+
+docker run -it --rm \
+    --env="DISPLAY" \
+    --env="QT_X11_NO_MITSHM=1" \
+    --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
+    duckietowne_gazebo.tar.gz:<replace_with_your_tag>
+    
+
+
+-------------------------
+if image is already running:
+
 docker ps
 docker exec -it <container_id_or_name> bash     # e.g., f905b6a61b75
 
@@ -86,3 +107,16 @@ Pause / Unpause / Reset
 -----------------------
 rosservice call /gazebo/pause_physics "{}"
 rosservice call /gazebo/unpause_physics "{}"
+
+========================================================================================================
+Gym-duckietown
+
+install as usual 
+
+git clone https://github.com/duckietown/gym-duckietown.git
+cd gym-duckietown
+pip3 install -e .
+
+
+Then edit the setup.py so that the numpy version is not asserted
+then install all the dependencied the requirements.txt in this repo
