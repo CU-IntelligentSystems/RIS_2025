@@ -1,0 +1,8 @@
+Instructions:
+
+Make all the 4 python files executable for example:
+chmod +x ./packages/my_package/src/red_line_detector.py
+
+build using the command: dts devel build -f
+
+lauch the launcher file using: dts devel run -R ROBOT_NAME -L duckiebot_launcher
