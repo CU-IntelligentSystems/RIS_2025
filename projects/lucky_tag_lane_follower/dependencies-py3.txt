@@ -1,0 +1,16 @@
+# LIST YOUR PYTHON3 PACKAGES HERE
+# NOTE: only place non-Duckietown libraries here; pin versions only if necessary
+apriltag
+numpy
+opencv-python
+transforms3d
+scipy>=1.7.0
+
+# NOTE: GTSAM needs to be installed system-wide:
+# For Ubuntu/Debian:
+# sudo apt-get install libgtsam-dev python3-gtsam
+# For other systems, build from source:
+# https://github.com/borglab/gtsam
+
+
+

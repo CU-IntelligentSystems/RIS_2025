@@ -1,0 +1,4 @@
+# LIST YOUR APT PACKAGES HERE
+libopencv-dev
+python3-opencv
+ros-noetic-tf2-geometry-msgs
