@@ -1,0 +1,60 @@
+# --- EKF Configuration for Duckiebot (ekf_duckiebot.yaml) ---
+
+
+# General filter settings
+frequency: 30.0          # Target update rate (Hz)
+sensor_timeout: 0.1      # Sensor data timeout (seconds)
+two_d_mode: true         # on ground 
+publish_tf: true         # Publish the odom->base_link transform
+publish_acceleration: false 
+print_diagnostics: true  
+
+# Coordinate Frames (standard Duckiebot frames)
+map_frame: map           # Ignored if map->odom transform is not published by this node
+odom_frame: odom         # Frame for continuous but drifting odometry
+base_link_frame: $(arg veh)/base # Robot's main frame
+world_frame: odom        # Set to odom_frame to publish odom->base_link transform
+
+# --- Sensor Inputs ---
+
+# Wheel Odometry
+odom0: /$(arg veh)/odom_converted 
+
+odom0_config: [false, false, false, false, false, false, true, false, false, false, false, false, false, false, false]
+odom0_queue_size: 2
+odom0_nodelay: false
+odom0_differential: false   
+odom0_relative: false
+
+# IMU Data
+imu0: /$(arg veh)/imu_node/data_fixed  # <<< Use the topic from your relay node
+imu0_config: [false, false, false,  # X, Y, Z   (No position from IMU)
+             false, false, false,  # Roll, Pitch, Yaw (Orientation is invalid, set all false)
+             false, false, false,  # Vx, Vy, Vz  (No velocity from IMU)
+             true,  true,  true,   # Vroll, VPitch, VYaw (Fuse angular velocity - Indices 9, 10, 11)
+             false, false, false]  # Ax, Ay, Az  (Keep false for now, tune later if needed - Indices 12, 13, 14)
+imu0_queue_size: 5
+imu0_nodelay: false
+imu0_differential: false # Angular velocity is absolute measurement
+imu0_relative: false     # Doesn't apply to velocity
+imu0_remove_gravitational_acceleration: true # Good practice if/when fusing acceleration later
+
+# --- Process Noise Covariance ---
+
+process_noise_covariance: [0.05, 0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,  # X
+                           0,    0.05, 0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,  # Y
+                           0,    0,    0.01, 0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,  # Z
+                           0,    0,    0,    0.01, 0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,  # Roll
+                           0,    0,    0,    0,    0.01, 0,    0,    0,    0,    0,    0,    0,    0,    0,    0,  # Pitch
+                           0,    0,    0,    0,    0,    0.06, 0,    0,    0,    0,    0,    0,    0,    0,    0,  # Yaw
+                           0,    0,    0,    0,    0,    0,    0.025,0,    0,    0,    0,    0,    0,    0,    0,  # Vx
+                           0,    0,    0,    0,    0,    0,    0,    0.01, 0,    0,    0,    0,    0,    0,    0,  # Vy
+                           0,    0,    0,    0,    0,    0,    0,    0,    0.01, 0,    0,    0,    0,    0,    0,  # Vz
+                           0,    0,    0,    0,    0,    0,    0,    0,    0,    0.01, 0,    0,    0,    0,    0,  # Vroll
+                           0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0.01, 0,    0,    0,    0,  # Vpitch
+                           0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0.04, 0,    0,    0,  # Vyaw
+                           0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0.01, 0,    0,  # Ax
+                           0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0.01, 0,  # Ay
+                           0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0.01] # Az
+
+

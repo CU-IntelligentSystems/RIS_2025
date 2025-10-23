@@ -1,0 +1,62 @@
+<launch>
+
+  <!-- Vehicle name -->
+  <arg name="veh" default="$(env VEHICLE_NAME)"/>
+
+  <!-- Where to save maps -->
+  <arg name="map_save_dir" default="/data/$(arg veh)/maps"/>
+
+  <!-- SLAM mapper parameters -->
+  <arg name="pkg_mapper"       default="slam"/>
+  <arg name="script_mapper"    default="slam_mapper_node.py"/>
+  <arg name="node_mapper_name" default="slam_mapper_node"/>
+
+  <!-- Localization & line detector -->
+  <include file="$(find Localization)/launch/duckiebot_localization.launch"/>
+  <include file="$(find White_detection)/launch/white_detection.launch">
+    <arg name="veh" value="$(arg veh)"/>
+  </include>
+
+  <!-- SLAM mapper node -->
+  <node pkg="$(arg pkg_mapper)"
+        type="$(arg script_mapper)"
+        name="$(arg node_mapper_name)"
+        output="screen">
+
+    <!-- map settings -->
+    <param name="map_resolution"    value="0.05"/>
+    <param name="map_width_meters"  value="10.0"/>
+    <param name="map_height_meters" value="10.0"/>
+    <param name="map_publish_rate"  value="1.0"/>
+    <param name="map_frame_id"      value="odom"/>
+
+    <!-- marking distances -->
+    <param name="mark_distance_y"   value="0.15"/>
+    <param name="mark_distance_x"   value="0.1"/>
+    <param name="mark_radius_cells" value="0"/>
+
+    <!-- topic remappings -->
+    <remap from="~line/left/status"  to="/line_status_detector/line/left/status"/>
+    <remap from="~line/right/status" to="/line_status_detector/line/right/status"/>
+    <remap from="/odometry/filtered" to="/odometry/filtered"/>
+  </node>
+
+  <!-- Map saver node -->
+  <node pkg="slam"
+        type="map_saver_node.py"
+        name="map_saver_node"
+        output="screen">
+    <!-- ensure the code sees the correct VEHICLE_NAME -->
+    <env  name="VEHICLE_NAME" value="$(arg veh)"/>
+
+    <!-- subscribe to the map topic your SLAM publishes -->
+    <param name="map_topic"  value="/map"/>
+
+    <!-- dump files into the persistent folder -->
+    <param name="output_dir" value="$(arg map_save_dir)"/>
+
+    <!-- base name: ente_map_<timestamp>.pgm / .yaml -->
+    <param name="map_name"   value="$(arg veh)_map"/>
+  </node>
+
+</launch>
