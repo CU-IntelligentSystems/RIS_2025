@@ -1,0 +1,60 @@
+# DuckieBot Lane Following System - Python Dependencies
+# Author: Mohamed Goda Ebrahim
+# Course: S25_CO-548-A_RIS Project
+
+# Core ROS2 Python packages
+rclpy>=3.3.0                    # ROS2 Python client library
+std_msgs                        # Standard ROS2 message types
+sensor_msgs                     # Sensor message types (Image, etc.)
+geometry_msgs                   # Geometry message types (Twist, etc.)
+
+# Computer Vision and Image Processing
+opencv-python>=4.5.0           # OpenCV for computer vision operations
+cv-bridge>=3.2.0               # ROS2-OpenCV bridge for image conversion
+numpy>=1.21.0                  # Numerical computing for image arrays
+
+# Mathematical and Scientific Computing
+scipy>=1.7.0                   # Scientific computing library
+matplotlib>=3.3.0              # Plotting library for data visualization
+
+# ROS2 Development Tools
+colcon-common-extensions        # Build tools for ROS2 workspace
+ament-python                    # Python build support for ROS2
+
+# Optional: Enhanced Development Tools
+rqt                            # ROS2 graphical tools
+rqt-image-view                 # Image visualization tool
+rqt-graph                      # Node graph visualization
+rqt-topic                      # Topic monitoring tool
+rqt-console                    # Log message viewer
+
+# Optional: Performance and Debugging
+psutil>=5.8.0                  # System monitoring for performance analysis
+memory-profiler>=0.60.0        # Memory usage profiling
+
+# Optional: Configuration and Utilities  
+pyyaml>=5.4.0                  # YAML configuration file support
+argparse                       # Command line argument parsing
+
+# Development and Testing (Optional)
+pytest>=6.0.0                 # Unit testing framework
+pytest-cov>=2.12.0            # Test coverage reporting
+black>=21.0.0                 # Code formatting
+flake8>=3.9.0                 # Code linting
+
+# Documentation (Optional)
+sphinx>=4.0.0                 # Documentation generation
+sphinx-rtd-theme>=0.5.0       # Read the Docs theme for Sphinx
+
+# Note: Some packages may be installed via rosdep instead of pip
+# Run the following commands for complete ROS2 setup:
+#
+# sudo apt update
+# sudo apt install python3-pip python3-colcon-common-extensions
+# sudo apt install ros-humble-cv-bridge ros-humble-image-transport
+# sudo apt install ros-humble-robot-state-publisher ros-humble-joint-state-publisher
+# sudo apt install ros-humble-gazebo-ros-pkgs ros-humble-rviz2
+#
+# For ROS2 Humble specifically:
+# sudo apt install ros-humble-rqt ros-humble-rqt-image-view
+# sudo apt install ros-humble-rqt-graph ros-humble-rqt-console
