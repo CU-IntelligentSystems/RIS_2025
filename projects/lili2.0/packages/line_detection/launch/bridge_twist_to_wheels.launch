@@ -1,0 +1,8 @@
+<launch>
+<!-- Launch the bridge node -->
+<node name="twist_to_wheels_node" pkg="line_detection" type="twist_to_wheels_node.py" output="screen">
+<param name="wheelbase" value="0.1"/>
+<remap from="custom_car_cmd" to="/line_detection/white_line_detector_follower/car_cmd"/>
+<remap from="wheels_cmd" to="/$(env VEHICLE_NAME)/wheels_driver_node/wheels_cmd"/>
+</node>
+</launch>
